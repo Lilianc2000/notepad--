@@ -14,7 +14,7 @@ int lireCaract(){
 	return fnt;	
 }
 
-void gotoPosition( int lig, int col ){
+void positionChar( int lig, int col ){
 	// ressources
 	COORD mycoord;
 	
@@ -32,7 +32,7 @@ void gotoPosition( int lig, int col ){
 //}
 
 void position(int posX,int posY){
-	gotoPosition(29,0);
+	positionChar(29,0);
 	printf("posX : %3d  posY : %3d", posX,posY);
 }
 
@@ -53,18 +53,18 @@ int main()
 	
 		// pas de vrif de bornes sur X et Y
 	
-	  	if      (i== 13){posX=posX+1; posY=0;      gotoPosition(posX,posY);} // entree
-		else if (i==472){posX=posX-1;              gotoPosition(posX,posY);} // fleche haut
-		else if (i==475){posX=posX  ; posY=posY-1; gotoPosition(posX,posY);} // fleche gauche
-		else if (i==477){posX=posX  ; posY=posY+1; gotoPosition(posX,posY);} // fleche droite
-		else if (i==480){posX=posX+1; posY       ; gotoPosition(posX,posY);} // fleche bas
+	  	if      (i== 13){posX=posX+1; posY=0;      positionChar(posX,posY);} // entree
+		else if (i==472){posX=posX-1;              positionChar(posX,posY);} // fleche haut
+		else if (i==475){posX=posX  ; posY=posY-1; positionChar(posX,posY);} // fleche gauche
+		else if (i==477){posX=posX  ; posY=posY+1; positionChar(posX,posY);} // fleche droite
+		else if (i==480){posX=posX+1; posY       ; positionChar(posX,posY);} // fleche bas
 //		else if (i==560){fond=0;couleur=15;} // touche F2
 //		else if (i==561){fond=10;couleur=15;} // touche F3
 //		else if (i==562){fond=10;couleur=1;} // touche F3
 		else if (i== 3){} 					// touche ESC sortir du programme
 		else {         // affiche le caractere courant                     
 		  	position(posX,posY);			
-			gotoPosition(posX,posY);
+			positionChar(posX,posY);
 			
 			
 			
@@ -74,7 +74,7 @@ int main()
 	  	
   }
 
-	gotoPosition(29,0);
+	positionChar(29,0);
 	
 
 
