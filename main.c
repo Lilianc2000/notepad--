@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include <windows.h>
 
+///////////////////////////////////////////////////////////////////////////////////////////////
+
 typedef struct caractere {
   char c;
   int fond;
@@ -24,6 +26,8 @@ typedef struct suiteParagraphe{
 typedef TSuiteParagraphe * PParagraphe;
 
 typedef TSuiteCaractere * PCaractere;
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
 
 int lireCaract(){
 	
@@ -64,6 +68,18 @@ void enregistrer(){}
 void selectionner(){}
 
 void ouvrir(){}
+
+PParagraphe pointeurPositionParagraphe(int position, PParagraphe pdebut) { //EN COURS DE MODIF
+	ptMaillon px=pdebut->ps;
+	int i=1;
+	while(i<position) {
+		px=px->ps;
+		i++;
+	}
+	return px;
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////
 
 int main()
 {
