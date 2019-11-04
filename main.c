@@ -29,7 +29,7 @@ typedef TSuiteCaractere * PCaractere;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
-int lireCaract(){
+int lireCaract(){		//Fonctionne
 	
 	char c=10;
 	int fnt=0;	
@@ -41,7 +41,7 @@ int lireCaract(){
 	return fnt;	
 }
 
-void positionChar( int lig, int col ){
+void positionChar( int lig, int col ){		//Fonctionne
 	// ressources
 	COORD mycoord;
 	
@@ -58,7 +58,7 @@ void positionChar( int lig, int col ){
 //     printf("%c", c);
 //}
 
-void position(int posX,int posY){
+void position(int posX,int posY){		//Fonctionne
 	positionChar(29,0);
 	printf("posX : %3d  posY : %3d", posX,posY);
 }
@@ -69,7 +69,7 @@ void selectionner(){}
 
 void ouvrir(){}
 
-PParagraphe pointeurPositionParagraphe(int position, PParagraphe pdebut) { //EN COURS DE MODIF
+PParagraphe pointeurPositionParagraphe(int position, PParagraphe pdebut) {		//A tester
 	PParagraphe px=pdebut->ps;
 	int i=1;
 	while(i<position) {
