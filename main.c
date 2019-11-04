@@ -94,8 +94,8 @@ PParagraphe insertionParagraphe(PParagraphe px) {		//A tester
 	px->ps=px->ps->pp;
 	//Creation d un bidon pdebutC
 	PCaractere pdebutC=(PCaractere)malloc(sizeof(TSuiteCaractere));
-	px->ps->pc=pdebutC
-	pdebut->cs=NULL;
+	px->ps->pc=pdebutC;
+	pdebutC->cs=NULL;
 	return px->ps;
 }
 
@@ -104,7 +104,7 @@ PCaractere insertionCaractere(PCaractere px) {		//A tester
 	PCaractere py=(PCaractere)malloc(sizeof(TSuiteCaractere));
 	py->cs=px->cs;
 	px->cs=py;
-	return px->ps;
+	return px->cs;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
