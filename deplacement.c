@@ -23,13 +23,13 @@ void gotoPosition( int lig, int col ){
 	SetConsoleCursorPosition( GetStdHandle( STD_OUTPUT_HANDLE ), mycoord );
 }
 
-void affiche(HANDLE hConsole, char c,int fond, int couleur){
-	int i;
+//void affiche(HANDLE hConsole, char c,int fond, int couleur){
+//	int i;
 	
-	i=16*fond+couleur;
-	SetConsoleTextAttribute(hConsole, i);
-      printf("%c", c);
-}
+//	i=16*fond+couleur;
+//	SetConsoleTextAttribute(hConsole, i);
+//     printf("%c", c);
+//}
 
 void position(int posX,int posY){
 	gotoPosition(29,0);
@@ -40,14 +40,14 @@ int main()
 {
   int i;
   int posX,posY;
-  int fond,couleur;
+//  int fond,couleur;
   
   HANDLE hConsole=GetStdHandle(STD_OUTPUT_HANDLE);
 
-	fond=0;couleur=15;
+//	fond=0;couleur=15;
 	i=0;posX=0;posY=0;
 	
-	boucle: while (i!=27){
+	boucle: while (i!=3){
 	  	
 	  	i=lireCaract();
 	
@@ -58,10 +58,10 @@ int main()
 		else if (i==475){posX=posX  ; posY=posY-1; gotoPosition(posX,posY);} // fleche gauche
 		else if (i==477){posX=posX  ; posY=posY+1; gotoPosition(posX,posY);} // fleche droite
 		else if (i==480){posX=posX+1; posY       ; gotoPosition(posX,posY);} // fleche bas
-		else if (i==560){fond=0;couleur=15;} // touche F2
-		else if (i==561){fond=10;couleur=15;} // touche F3
-		else if (i==562){fond=10;couleur=1;} // touche F3
-		else if (i== 27){} 					// touche ESC sortir du programme
+//		else if (i==560){fond=0;couleur=15;} // touche F2
+//		else if (i==561){fond=10;couleur=15;} // touche F3
+//		else if (i==562){fond=10;couleur=1;} // touche F3
+		else if (i== 3){} 					// touche ESC sortir du programme
 		else {         // affiche le caractere courant                     
 		  	position(posX,posY);			
 			gotoPosition(posX,posY);
@@ -75,13 +75,6 @@ int main()
   }
 
 	gotoPosition(29,0);
-	printf("Pour quitter le programme tapez A");
-	i=lireCaract();
-	if (i!=65){	gotoPosition(29,0);
-				printf("                                              "); 
-				gotoPosition(posX,posY);
-	 			goto boucle;
-	}
 	
 
 
