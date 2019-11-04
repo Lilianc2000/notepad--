@@ -63,12 +63,19 @@ void position(int posX,int posY){		//Fonctionne
 	printf("posX : %3d  posY : %3d", posX,posY);
 }
 
-void enregistrer(){}
+void enregistrer(){		//A coder
+	
+}
 
-void selectionner(){}
+void selectionner(){		//A coder
+	
+}
 
-void ouvrir(){}
+void ouvrir(){		//A coder
+	
+}
 
+//Retourne le pointeur px de la case correspondante a la position donnee dans la liste paragraphe
 PParagraphe pointeurPositionParagraphe(int position, PParagraphe pdebut) {		//A tester
 	PParagraphe px=pdebut->ps;
 	int i=1;
@@ -77,6 +84,27 @@ PParagraphe pointeurPositionParagraphe(int position, PParagraphe pdebut) {		//A 
 		i++;
 	}
 	return px;
+}
+
+//Insertion d un nouveau paragraphe dans la liste paragraphe apres la case px, retourne le pointeur de la case creee
+PParagraphe insertionParagraphe(PParagraphe px) {		//A tester
+	px->ps->pp=(PParagraphe)malloc(sizeof(TSuiteParagraphe));
+	px->ps->pp->ps=px->ps;
+	px->ps->pp->pp=px;
+	px->ps=px->ps->pp;
+	//Creation d un bidon pdebutC
+	PCaractere pdebutC=(PCaractere)malloc(sizeof(TSuiteCaractere));
+	px->ps->pc=pdebutC
+	pdebut->cs=NULL;
+	return px->ps;
+}
+
+//Insertion d un nouveau caractere dans la liste caractere apres la case px, retourne le pointeur de la case cree
+PCaractere insertionCaractere(PCaractere px) {		//A tester
+	PCaractere py=(PCaractere)malloc(sizeof(TSuiteCaractere));
+	py->cs=px->cs;
+	px->cs=py;
+	return px->ps;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
