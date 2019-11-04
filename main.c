@@ -1,2 +1,16 @@
 //Main.c
-void main(void
+#include <stdio.h>
+#include <stdlib.h>
+
+
+void main(void) {
+  
+  
+  
+  
+  
+  
+  
+  
+  
+}
