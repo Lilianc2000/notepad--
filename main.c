@@ -63,9 +63,49 @@ void position(int posX,int posY){		//Fonctionne
 	printf("posX : %3d  posY : %3d", posX,posY);
 }
 
-void enregistrer(){		//A coder
-	
+void enregistrer(HANDLE hConsole, PParagraphe pdebut, PParagraphe pfin){	//A coder
+    PParagraphe px;
+    int test = -1;
+    FILE *f;
+    f = fopen("texte.txt", "r");
+    fscanf(f, "%c", &test);
+    if (test != -1){
+        SetConsoleTextAttribute(hConsole, BACKGROUND_BLUE | BACKGROUND_GREEN | BACKGROUND_RED | FOREGROUND_RED);
+        printf("Le fichier existe d%cj%c, voulez-vous l'%ccraser ? (O/N)", 130, 133, 130);
+        test = lireCaract();
+        if (test == 79 || test == 111){
+            fclose(f);
+            f = fopen("texte.txt", "w+t");
+        //    while (px != pfin){
+        //        fprintf(f, "%c;", px->info);
+        //        px = px->ps;
+        //    }
+         MessageBeep(MB_OK);
+         MessageBox(NULL, TEXT("Fichier enregistré sous : texte.txt"), TEXT("Enregistrer"),MB_OK);
+         fclose(f);
+        }
+        else {
+            fclose(f);
+        }
+        printf("\x0d");                 //Curseur au début de la ligne et effacage du message
+        SetConsoleTextAttribute(hConsole, 0);
+        printf("                                                        ");
+        printf("\x0d");
+    }
+    else {
+            fclose(f);
+            f = fopen("texte.txt", "w+t");
+        //    while (px != pfin){
+        //        fprintf(f, "%c;", px->info);
+        //        px = px->ps;
+        //    }
+         MessageBeep(MB_OK);
+         MessageBox(NULL, TEXT("Fichier enregistré sous : texte.txt"), TEXT("Enregistrer"),MB_OK);
+         fclose(f);
+
+    }
 }
+
 
 void selectionner(){		//A coder
 	
@@ -138,7 +178,7 @@ int main()
 		else if (i==475){posX=posX  ; posY=posY-1; 	positionChar(posX,posY);} 				// fleche gauche
 		else if (i==477){posX=posX  ; posY=posY+1; 	positionChar(posX,posY);} 				// fleche droite
 		else if (i==480){posX=posX+1; posY       ; 	positionChar(posX,posY);} 				// fleche bas
-    	else if (i==19){enregistrer();}                                     				//CTRL + S
+    	else if (i==19){enregistrer(hconsole, pdebut, pfin);}                                     				//CTRL + S
     	else if (i==15){ouvrir();}                                           				//CTRL + O
     	else if (i==4){selectionner();}                                      				//CTRL + D
     
