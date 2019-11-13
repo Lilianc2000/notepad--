@@ -64,7 +64,8 @@ void position(int posX,int posY){		//Fonctionne
 }
 
 void enregistrer(HANDLE hConsole, PParagraphe pdebut, PParagraphe pfin){	//A coder
-    PParagraphe px;
+    PParagraphe px = pdebut->ps;
+    PCaractere py = px->pc->cs;
     int test = -1;
     FILE *f;
     f = fopen("texte.txt", "r");
@@ -76,10 +77,14 @@ void enregistrer(HANDLE hConsole, PParagraphe pdebut, PParagraphe pfin){	//A cod
         if (test == 79 || test == 111){
             fclose(f);
             f = fopen("texte.txt", "w+t");
-        //    while (px != pfin){
-        //        fprintf(f, "%c;", px->info);
-        //        px = px->ps;
-        //    }
+            while (px != pfin){
+                while (py->cs != NULL){
+                    fprintf(f, "%c;", py->info.c);
+                    py = py->cs;
+                }
+                px = px->ps;
+                py = px->pc->cs;
+            }
          MessageBeep(MB_OK);
          MessageBox(NULL, TEXT("Fichier enregistré sous : texte.txt"), TEXT("Enregistrer"),MB_OK);
          fclose(f);
@@ -105,6 +110,7 @@ void enregistrer(HANDLE hConsole, PParagraphe pdebut, PParagraphe pfin){	//A cod
 
     }
 }
+
 
 
 void selectionner(){		//A coder
