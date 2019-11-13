@@ -178,7 +178,7 @@ int main()
 		else if (i==475){posX=posX  ; posY=posY-1; 	positionChar(posX,posY);} 				// fleche gauche
 		else if (i==477){posX=posX  ; posY=posY+1; 	positionChar(posX,posY);} 				// fleche droite
 		else if (i==480){posX=posX+1; posY       ; 	positionChar(posX,posY);} 				// fleche bas
-    	else if (i==19){enregistrer(hconsole, pdebut, pfin);}                                     				//CTRL + S
+    	else if (i==19){enregistrer(hConsole, pdebut, pfin);}                                     				//CTRL + S
     	else if (i==15){ouvrir();}                                           				//CTRL + O
     	else if (i==4){selectionner();}                                      				//CTRL + D
     
