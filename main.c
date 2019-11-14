@@ -64,75 +64,111 @@ void position(int posX,int posY){		//Fonctionne
 }
 
 //Sauvegarde les donnes des listes dans le fichier teste.txt dans le repertoire d execution de l application
-void enregistrer(HANDLE hConsole, PParagraphe pdebut, PParagraphe pfin){	//Fonctionne
+void enregistrer(HANDLE hConsole, PParagraphe pdebut, PParagraphe pfin) 	//Fonctionne
+{
     PParagraphe px;
     PCaractere py;
     int test = -1;
-    FILE *f;
+    FILE *f = NULL;
     f = fopen("texte.txt", "r");
     fscanf(f, "%c", &test);
-    if(test!=-1){
+    if(test!=-1)                                                                                                     //Test s'il y a déja un fichier rempli
+    {
         SetConsoleTextAttribute(hConsole, BACKGROUND_BLUE | BACKGROUND_GREEN | BACKGROUND_RED | FOREGROUND_RED);
-        printf("Le fichier existe d%cj%c, voulez-vous l'%ccraser ? (O/N)", 130, 133, 130);
+        printf("\nLe fichier existe d%cj%c, voulez-vous l'%ccraser ? (O/N)", 130, 133, 130);
         test = lireCaract();
-        if(test==79 || test==111){
+        if(test==79 || test==111)
+        {
             fclose(f);
             f = fopen("texte.txt", "w+t");
-            
+
             //Ecriture des donnees
             px=pdebut->ps;
-            while(px!=pfin){
-            	py=px->pc->cs;
-                while(py!=NULL){
+            while(px!=pfin)
+            {
+                py=px->pc->cs;
+                while(py!=NULL)
+                {
                     fprintf(f, "%c;", py->info.c);
                     py=py->cs;
                 }
                 fprintf(f, ":");
                 px=px->ps;
             }
-            
-        	MessageBeep(MB_OK);
-        	MessageBox(NULL, TEXT("Fichier enregistré sous : texte.txt"), TEXT("Enregistrer"),MB_OK);
-        	fclose(f);
+
+            MessageBeep(MB_OK);
+            MessageBox(NULL, TEXT("Fichier enregistre sous : texte.txt"), TEXT("Enregistrer"),MB_OK);
+            fclose(f);
         }
-        else {
+        else
+        {
             fclose(f);
         }
         printf("\x0d");                 //Curseur au début de la ligne et effacage du message
         SetConsoleTextAttribute(hConsole, 0);
         printf("                                                        ");
         printf("\x0d");
+
     }
-    else {
+    else
+    {
         fclose(f);
         f = fopen("texte.txt", "w+t");
-        
+
         //Ecriture des donnees
         px=pdebut->ps;
-		while(px!=pfin){
-			py=px->pc->cs;
-            while(py!=NULL){
+        while(px!=pfin)
+        {
+            py=px->pc->cs;
+            while(py!=NULL)
+            {
                 fprintf(f, "%c;", py->info.c);
                 py=py->cs;
             }
             fprintf(f, ":");
             px=px->ps;
         }
-        
-         MessageBeep(MB_OK);
-         MessageBox(NULL, TEXT("Fichier enregistré sous : texte.txt"), TEXT("Enregistrer"),MB_OK);
-         fclose(f);
+
+        MessageBeep(MB_OK);
+        MessageBox(NULL, TEXT("Fichier enregistre sous : texte.txt"), TEXT("Enregistrer"),MB_OK);
+        fclose(f);
     }
 }
 
 
 
-void selectionner(){		//A coder
-	
+void selectionner() 		//A coder
+{
+
 }
 
-void ouvrir(){		//A coder
-	
+void ouvrir(PParagraphe pdebut) 		//A coder //Doit retourner la position du curseur ? Impossible de retourner PParagraphe ET Pcaractere
+{
+    int test = -1, i=0;
+    PCaractere pc;
+    PParagraphe pp;
+    pc->cs=pdebut;
+    FILE *f = NULL;
+    f = fopen("texte.txt", "r");
+    fscanf(f, "%c", &test);
+    if(test==-1)
+    {
+        MessageBeep(MB_OK);
+        MessageBox(NULL, TEXT("Le fichier 'texte.txt' est introuvable.\nAnnulation."), TEXT("Alerte"),MB_OK);
+    }
+    else
+    {
+        while (pp!=NULL)
+        {
+            while (i!=58)
+            {
+                fscanf(f,"%c;", &i);
+                pc=insertionCaractere(pc);
+                pc->info.c=i;
+            }
+            pp=insertionParagraphe(pp);
+        }
+    }
 }
 
 //Retourne le pointeur px de la case correspondante a la position donnee dans la liste paragraphe
