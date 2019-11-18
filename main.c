@@ -18,6 +18,7 @@ typedef struct suiteCaractere{
 
 typedef struct suiteParagraphe{
   int numeroParagraphe;
+  int quantiteCaractere;
   struct suiteParagraphe * ps;			//paragrapheSuivant
   struct suiteParagraphe * pp;			//paragraphePrecedent
   TSuiteCaractere * pc;					//premierCaractere
@@ -57,6 +58,7 @@ PParagraphe insertionParagraphe(PParagraphe px) {		//Fonctionne
 	px->ps->pp->ps=px->ps;
 	px->ps->pp->pp=px;
 	px->ps=px->ps->pp;
+	px->quantiteCaractere=0;
 	//Creation d un bidon pdebutC
 	PCaractere pdebutC=(PCaractere)malloc(sizeof(TSuiteCaractere));
 	px->ps->pc=pdebutC;
@@ -205,7 +207,6 @@ void selectionner() 		//A coder
 
 }
 
-//Doit retourner la position du curseur ? Impossible de retourner PParagraphe ET Pcaractere
 void ouvrir(PParagraphe pdebut, PParagraphe pfin) {		//A tester
     int test = -1, i=0;
     PCaractere py;
@@ -237,6 +238,7 @@ void ouvrir(PParagraphe pdebut, PParagraphe pfin) {		//A tester
                 if(i!=42 && i!=58 && i!=59) {						//i=42 => *
                 	py=insertionCaractere(py);
                 	py->info.c=i;
+                	px->quantiteCaractere++;
                 	printf("%c", i);
 				}
                 
@@ -291,28 +293,22 @@ int main() {
      	    positionChar(posX,posY);
 		}
 		else if (i==472) {				//Fleche haut
-			posX=posX-1;
+			posX--;
 			if(posX<0) {
 				posX=0;
 			}
 			//Si ligne au dessus plus courte
-			if(posX!=0 && posY>quantiteCaractere(pointeurPositionParagraphe(posX, pdebut))) {
-				posY=quantiteCaractere(pointeurPositionParagraphe(posX+1, pdebut));
+			if(1) {
+				
 			}
-			px=pointeurPositionParagraphe(posX+1, pdebut);
-			py=pointeurPositionCaractere(posY+1, px->pc);
-			position(posX,posY);
-     	    positionChar(posX,posY);
+			position(posX,posY); positionChar(posX,posY);
 		}
 		else if (i==475) {				//Fleche gauche
-			posY=posY-1;
+			posY--;
 			if(posY<0) {
 				posY=0;
 			}
-			px=pointeurPositionParagraphe(posX+1, pdebut);
-			py=pointeurPositionCaractere(posY-1, px->pc);
-			position(posX,posY);
-			positionChar(posX,posY);
+			position(posX,posY); positionChar(posX,posY);
 		}
 		else if (i==477) {				//Fleche droite
 			posY++;
@@ -320,13 +316,10 @@ int main() {
 			if(py->cs==NULL) {
 				posY--;
 			}
-			px=pointeurPositionParagraphe(posX+1, pdebut);
-			py=pointeurPositionCaractere(posY, px->pc);
-			position(posX,posY);
-			positionChar(posX,posY);
+			position(posX,posY); positionChar(posX,posY);
 		}
 		else if (i==480) {				//Fleche bas
-			posX=posX+1;
+			posX++;
 			//Si arrive en bout de doc
 			if(posX==pfin->pp->numeroParagraphe) {
 				posX--;
@@ -335,12 +328,9 @@ int main() {
 			if(1) {
 					
 			}
-			px=pointeurPositionParagraphe(posX+1, pdebut);
-			py=pointeurPositionCaractere(posY-1, px->pc);
-			position(posX,posY);
-			positionChar(posX,posY);
+			position(posX,posY); positionChar(posX,posY);
 		}
-    	else if (i==19) {				//CTRL + S
+		else if (i==19) {				//CTRL + S
     		//Sauvegarder dans un fichier
 			enregistrer(hConsole, pdebut, pfin);
 		}
@@ -374,7 +364,7 @@ int main() {
 			//Enregistrement du caractere tape dans le paragraphe
 			py=insertionCaractere(py);
 			py->info.c=i;
-
+			px->quantiteCaractere++;
 		  	affiche(hConsole, i, fond, couleur);
 		  	posY=posY+1;
 	   }
