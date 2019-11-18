@@ -87,6 +87,19 @@ int quantiteCaractere(PParagraphe px) {
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
+int tailleFenetre(HANDLE hConsole){
+	CONSOLE_SCREEN_BUFFER_INFO info;
+	short rows;
+	short columns;
+	hConsole = CreateFileW(L"CONOUT$", GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
+	if (GetConsoleScreenBufferInfo(hConsole, &info) == 0)
+		return 1;
+	CloseHandle(hConsole);
+	columns = info.srWindow.Right - info.srWindow.Left + 1;
+	rows = info.srWindow.Bottom - info.srWindow.Top + 1;
+//	wprintf(L"%d columns by %d rows\n", columns, rows);
+	return rows;
+}
 
 int lireCaract(){		//Fonctionne
 
@@ -117,8 +130,8 @@ void affiche(HANDLE hConsole, char c,int fond, int couleur){
     printf("%c", c);
 }
 
-void position(int posX,int posY){		//Fonctionne
-	positionChar(29,0);
+void position(int posX,int posY, HANDLE hConsole){		//Fonctionne
+	positionChar(tailleFenetre(hConsole),0);
 	printf("posX : %3d  posY : %3d", posX,posY);
 }
 
@@ -301,14 +314,14 @@ int main() {
 			if(1) {
 				
 			}
-			position(posX,posY); positionChar(posX,posY);
+			position(posX,posY,hConsole); positionChar(posX,posY);
 		}
 		else if (i==475) {				//Fleche gauche
 			posY--;
 			if(posY<0) {
 				posY=0;
 			}
-			position(posX,posY); positionChar(posX,posY);
+			position(posX,posY,hConsole); positionChar(posX,posY);
 		}
 		else if (i==477) {				//Fleche droite
 			posY++;
@@ -316,7 +329,7 @@ int main() {
 			if(py->cs==NULL) {
 				posY--;
 			}
-			position(posX,posY); positionChar(posX,posY);
+			position(posX,posY,hConsole); positionChar(posX,posY);
 		}
 		else if (i==480) {				//Fleche bas
 			posX++;
@@ -328,7 +341,7 @@ int main() {
 			if(1) {
 					
 			}
-			position(posX,posY); positionChar(posX,posY);
+			position(posX,posY,hConsole); positionChar(posX,posY);
 		}
 		else if (i==19) {				//CTRL + S
     		//Sauvegarder dans un fichier
@@ -346,7 +359,7 @@ int main() {
 			}
 			posX=px->numeroParagraphe-1;
 			positionChar(posX,posY);
-			position(posX, posY);
+			position(posX, posY,hConsole);
 		}
     	else if (i==4) {				//CTRL + D
 			selectionner();
@@ -358,7 +371,7 @@ int main() {
 
 		else if (i==3) {}				// touche CTRL + C sortir du programme
 		else {				//Affiche le caractere courant
-		  	position(posX,posY);
+		  	position(posX,posY,hConsole);
 			positionChar(posX,posY);
 
 			//Enregistrement du caractere tape dans le paragraphe
