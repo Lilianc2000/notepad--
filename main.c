@@ -43,8 +43,8 @@ PParagraphe pointeurPositionParagraphe(int position, PParagraphe pdebut) {		//Fo
 
 //Retourne le pointeur px de la case correspondante a la position donne d un caractere dans un paragraphe
 PCaractere pointeurPositionCaractere(int position, PCaractere pdebut) {			//Fonctionne
-	PCaractere px=pdebut->cs;
-	int i=1;
+	PCaractere px=pdebut;
+	int i=0;
 	while(i<position) {
 		px=px->cs;
 		i++;
@@ -58,9 +58,9 @@ PParagraphe insertionParagraphe(PParagraphe px) {		//Fonctionne
 	px->ps->pp->ps=px->ps;
 	px->ps->pp->pp=px;
 	px->ps=px->ps->pp;
-	px->quantiteCaractere=0;
 	//Creation d un bidon pdebutC
 	PCaractere pdebutC=(PCaractere)malloc(sizeof(TSuiteCaractere));
+	px->ps->quantiteCaractere=0;
 	px->ps->pc=pdebutC;
 	pdebutC->cs=NULL;
 	return px->ps;
@@ -87,6 +87,7 @@ int quantiteCaractere(PParagraphe px) {
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
+
 int tailleFenetre(HANDLE hConsole){
 	CONSOLE_SCREEN_BUFFER_INFO info;
 	short rows;
@@ -96,7 +97,7 @@ int tailleFenetre(HANDLE hConsole){
 		return 1;
 	CloseHandle(hConsole);
 	columns = info.srWindow.Right - info.srWindow.Left + 1;
-	rows = info.srWindow.Bottom - info.srWindow.Top + 1;
+	rows = info.srWindow.Bottom - info.srWindow.Top;
 //	wprintf(L"%d columns by %d rows\n", columns, rows);
 	return rows;
 }
@@ -265,8 +266,7 @@ void ouvrir(PParagraphe pdebut, PParagraphe pfin) {		//A tester
     }
 }
 
-
-
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 int main() {
 	int i;
@@ -302,45 +302,43 @@ int main() {
 			px=insertionParagraphe(px);
 			py=px->pc;
 			
-			position(posX,posY,hConsole);
-     	    		positionChar(posX,posY);
+			position(posX,posY, hConsole);
+     	    positionChar(posX,posY);
 		}
-		else if (i==472) {				//Fleche haut
-			posX--;
-			if(posX<0) {
-				posX=0;
-			}
-			//Si ligne au dessus plus courte
-			if(1) {
-				
-			}
-			position(posX,posY,hConsole); positionChar(posX,posY);
-		}
-		else if (i==475) {				//Fleche gauche
-			posY--;
-			if(posY<0) {
-				posY=0;
-			}
-			position(posX,posY,hConsole); positionChar(posX,posY);
-		}
-		else if (i==477) {				//Fleche droite
-			posY++;
-			//Si arrive en bout de paragraphe
-			if(py->cs==NULL) {
-				posY--;
-			}
-			position(posX,posY,hConsole); positionChar(posX,posY);
-		}
-		else if (i==480) {				//Fleche bas
-			posX++;
-			//Si arrive en bout de doc
-			if(posX==pfin->pp->numeroParagraphe) {
+		else if (i==472) {				//Fleche haut posX--
+			if(posX>=1) {
 				posX--;
+				px=px->pp;
 			}
-			//Si ligne en dessous plus courte
-			if(1) {
-					
+			
+			position(posX,posY,hConsole); positionChar(posX,posY);
+		}
+		else if (i==475) {				//Fleche gauche posY--
+			if(posY>=1) {
+				posY--;
+				if(posY==0) {
+					py=px->pc;
+				} else {
+					py=pointeurPositionCaractere(posY, px->pc->cs);
+				}
 			}
+			
+			position(posX,posY,hConsole); positionChar(posX,posY);
+		}
+		else if (i==477) {				//Fleche droite posY++
+			if(posY<quantiteCaractere(px)) {
+				posY++;
+				py=py->cs;
+			}
+			
+			position(posX,posY,hConsole); positionChar(posX,posY);
+		}
+		else if (i==480) {				//Fleche bas posX++
+			if(px->ps!=pfin) {
+				posX++;
+				px=px->ps;
+			}
+			
 			position(posX,posY,hConsole); positionChar(posX,posY);
 		}
 		else if (i==19) {				//CTRL + S
@@ -377,7 +375,7 @@ int main() {
 			//Enregistrement du caractere tape dans le paragraphe
 			py=insertionCaractere(py);
 			py->info.c=i;
-			px->quantiteCaractere++;
+			px->quantiteCaractere=px->quantiteCaractere+1;
 		  	affiche(hConsole, i, fond, couleur);
 		  	posY=posY+1;
 	   }
