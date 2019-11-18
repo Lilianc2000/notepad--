@@ -9,42 +9,87 @@ typedef struct caractere {
   char c;
   int fond;
   int couleur;
-}TCaractere; 
- 
+}TCaractere;
+
 typedef struct suiteCaractere{
   TCaractere info;
   struct suiteCaractere * cs;   			//caractereSuivant
-}TSuiteCaractere; 
- 
+}TSuiteCaractere;
+
 typedef struct suiteParagraphe{
   int numeroParagraphe;
   struct suiteParagraphe * ps;			//paragrapheSuivant
   struct suiteParagraphe * pp;			//paragraphePrecedent
   TSuiteCaractere * pc;					//premierCaractere
-} TSuiteParagraphe; 
- 
+} TSuiteParagraphe;
+
 typedef TSuiteParagraphe * PParagraphe;
 
 typedef TSuiteCaractere * PCaractere;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
+//Retourne le pointeur px de la case correspondante a la position donnee dans la liste paragraphe
+PParagraphe pointeurPositionParagraphe(int position, PParagraphe pdebut) {		//Fonctionne
+	PParagraphe px=pdebut->ps;
+	int i=1;
+	while(i<position) {
+		px=px->ps;
+		i++;
+	}
+	return px;
+}
+
+//Retourne le pointeur px de la case correspondante a la position donne d un caractere dans un paragraphe
+PCaractere pointeurPositionCaractere(int position, PCaractere pdebut) {			//Fonctionne
+	PCaractere px=pdebut->cs;
+	int i=1;
+	while(i<position) {
+		px=px->cs;
+		i++;
+	}
+	return px;
+}
+
+//Insertion d un nouveau paragraphe dans la liste paragraphe apres la case px, retourne le pointeur de la case creee
+PParagraphe insertionParagraphe(PParagraphe px) {		//Fonctionne
+	px->ps->pp=(PParagraphe)malloc(sizeof(TSuiteParagraphe));
+	px->ps->pp->ps=px->ps;
+	px->ps->pp->pp=px;
+	px->ps=px->ps->pp;
+	//Creation d un bidon pdebutC
+	PCaractere pdebutC=(PCaractere)malloc(sizeof(TSuiteCaractere));
+	px->ps->pc=pdebutC;
+	pdebutC->cs=NULL;
+	return px->ps;
+}
+
+//Insertion d un nouveau caractere dans la liste caractere apres la case px, retourne le pointeur de la case cree
+PCaractere insertionCaractere(PCaractere px) {		//Fonctionne
+	PCaractere py=(PCaractere)malloc(sizeof(TSuiteCaractere));
+	py->cs=px->cs;
+	px->cs=py;
+	return px->cs;
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////
+
 int lireCaract(){		//Fonctionne
-	
+
 	char c=10;
-	int fnt=0;	
-	
+	int fnt=0;
+
 	c=getch();
 	fnt=c;
 	if (c==-32){c=getch();fnt = 400+c;}
 	if (c==0)  {c=getch();fnt = 500+c;}
-	return fnt;	
+	return fnt;
 }
 
 void positionChar( int lig, int col ){		//Fonctionne
 	// ressources
 	COORD mycoord;
-	
+
 	mycoord.X = col;
 	mycoord.Y = lig;
 	SetConsoleCursorPosition( GetStdHandle( STD_OUTPUT_HANDLE ), mycoord );
@@ -52,7 +97,7 @@ void positionChar( int lig, int col ){		//Fonctionne
 
 void affiche(HANDLE hConsole, char c,int fond, int couleur){
 	int i;
-	
+
 	i=16*fond+couleur;
 	SetConsoleTextAttribute(hConsole, i);
      printf("%c", c);
@@ -147,7 +192,7 @@ void ouvrir(PParagraphe pdebut) 		//A coder //Doit retourner la position du curs
     int test = -1, i=0;
     PCaractere pc;
     PParagraphe pp;
-    pc->cs=pdebut;
+    pc = pdebut->pc;
     FILE *f = NULL;
     f = fopen("texte.txt", "r");
     fscanf(f, "%c", &test);
@@ -158,6 +203,7 @@ void ouvrir(PParagraphe pdebut) 		//A coder //Doit retourner la position du curs
     }
     else
     {
+        // -------------------------------------------- VIDER LA LISTE EXISTANTE
         while (pp!=NULL)
         {
             while (i!=58)
@@ -171,50 +217,8 @@ void ouvrir(PParagraphe pdebut) 		//A coder //Doit retourner la position du curs
     }
 }
 
-//Retourne le pointeur px de la case correspondante a la position donnee dans la liste paragraphe
-PParagraphe pointeurPositionParagraphe(int position, PParagraphe pdebut) {		//Fonctionne
-	PParagraphe px=pdebut->ps;
-	int i=1;
-	while(i<position) {
-		px=px->ps;
-		i++;
-	}
-	return px;
-}
 
-//Retourne le pointeur px de la case correspondante a la position donne d un caractere dans un paragraphe
-PCaractere pointeurPositionCaractere(int position, PCaractere pdebut) {			//Fonctionne
-	PCaractere px=pdebut->cs;
-	int i=1;
-	while(i<position) {
-		px=px->cs;
-		i++;
-	}
-	return px;
-}
 
-//Insertion d un nouveau paragraphe dans la liste paragraphe apres la case px, retourne le pointeur de la case creee
-PParagraphe insertionParagraphe(PParagraphe px) {		//Fonctionne
-	px->ps->pp=(PParagraphe)malloc(sizeof(TSuiteParagraphe));
-	px->ps->pp->ps=px->ps;
-	px->ps->pp->pp=px;
-	px->ps=px->ps->pp;
-	//Creation d un bidon pdebutC
-	PCaractere pdebutC=(PCaractere)malloc(sizeof(TSuiteCaractere));
-	px->ps->pc=pdebutC;
-	pdebutC->cs=NULL;
-	return px->ps;
-}
-
-//Insertion d un nouveau caractere dans la liste caractere apres la case px, retourne le pointeur de la case cree
-PCaractere insertionCaractere(PCaractere px) {		//Fonctionne
-	PCaractere py=(PCaractere)malloc(sizeof(TSuiteCaractere));
-	py->cs=px->cs;
-	px->cs=py;
-	return px->cs;
-}
-
-//////////////////////////////////////////////////////////////////////////////////////////////////
 
 int main()
 {
@@ -227,23 +231,23 @@ int main()
 
 	fond=0;couleur=15;
 	i=0;posX=0;posY=0;
-	
+
 	//Creation de la liste paragraphe
 	pdebut=(PParagraphe)malloc(sizeof(TSuiteParagraphe));
 	pfin=(PParagraphe)malloc(sizeof(TSuiteParagraphe));
 	pdebut->ps=pfin;
 	pfin->pp=pdebut;
-	
+
 	//Creation du 1ier paragraphe
 	px=insertionParagraphe(pdebut);
 	px->numeroParagraphe=posX+1;
 	py=px->pc;
-	
+
 	while (i!=3) {				//CTRL + C
 	  	i=lireCaract();
-		
+
 		//Pas de verification de bornes sur X et Y
-		
+
 	  	if (i==13) {				//Entree
 			posX=posX+1;
 			posY=0;
@@ -265,7 +269,7 @@ int main()
 			posX=posX;
 			posY=posY+1;
 			positionChar(posX,posY);
-		} 
+		}
 		else if (i==480) {				//Fleche bas
 			posX=posX+1;
 			posY;
@@ -275,21 +279,21 @@ int main()
 			enregistrer(hConsole, pdebut, pfin);
 		}
     	else if (i==15) {				//CTRL + O
-			ouvrir();
+//			ouvrir();
 		}
     	else if (i==4) {				//CTRL + D
 			selectionner();
 		}
-    
+
 //		else if (i==560){fond=0;couleur=15;} 												// touche F2
 //		else if (i==561){fond=10;couleur=15;} 												// touche F3
 //		else if (i==562){fond=10;couleur=1;} 												// touche F3
-             
+
 		else if (i==3) {}				// touche CTRL + C sortir du programme
-		else {				//Affiche le caractere courant                     
-		  	position(posX,posY);			
+		else {				//Affiche le caractere courant
+		  	position(posX,posY);
 			positionChar(posX,posY);
-			
+
 			//Enregistrement du caractere tape dans le paragraphe
 			py=insertionCaractere(py);
 			py->info.c=i;
@@ -297,11 +301,11 @@ int main()
 		  	affiche(hConsole, i, fond, couleur);
 		  	posY=posY+1;
 	   }
-	  	
+
   }
 
 	positionChar(29,0);
-	
+
 
 
 }
