@@ -100,7 +100,7 @@ void affiche(HANDLE hConsole, char c,int fond, int couleur){
 
 	i=16*fond+couleur;
 	SetConsoleTextAttribute(hConsole, i);
-     printf("%c", c);
+    printf("%c", c);
 }
 
 void position(int posX,int posY){		//Fonctionne
@@ -120,6 +120,7 @@ void enregistrer(HANDLE hConsole, PParagraphe pdebut, PParagraphe pfin) 	//Fonct
     if(test!=-1)                                                                                                     //Test s'il y a déja un fichier rempli
     {
         SetConsoleTextAttribute(hConsole, BACKGROUND_BLUE | BACKGROUND_GREEN | BACKGROUND_RED | FOREGROUND_RED);
+        positionChar(28,0);
         printf("\nLe fichier existe d%cj%c, voulez-vous l'%ccraser ? (O/N)", 130, 133, 130);
         test = lireCaract();
         if(test==79 || test==111)
@@ -140,7 +141,7 @@ void enregistrer(HANDLE hConsole, PParagraphe pdebut, PParagraphe pfin) 	//Fonct
                 fprintf(f, ":");
                 px=px->ps;
             }
-
+			fprintf(f, "*");
             MessageBeep(MB_OK);
             MessageBox(NULL, TEXT("Fichier enregistre sous : texte.txt"), TEXT("Enregistrer"),MB_OK);
             fclose(f);
@@ -173,8 +174,9 @@ void enregistrer(HANDLE hConsole, PParagraphe pdebut, PParagraphe pfin) 	//Fonct
             fprintf(f, ":");
             px=px->ps;
         }
-
-        MessageBeep(MB_OK);
+		fprintf(f, "*");
+		
+    	MessageBeep(MB_OK);
         MessageBox(NULL, TEXT("Fichier enregistre sous : texte.txt"), TEXT("Enregistrer"),MB_OK);
         fclose(f);
     }
@@ -187,15 +189,16 @@ void selectionner() 		//A coder
 
 }
 
-void ouvrir(PParagraphe pdebut) 		//A coder //Doit retourner la position du curseur ? Impossible de retourner PParagraphe ET Pcaractere
-{
+//Doit retourner la position du curseur ? Impossible de retourner PParagraphe ET Pcaractere
+void ouvrir(PParagraphe pdebut, PParagraphe pfin) {		//A coder
     int test = -1, i=0;
-    PCaractere pc;
-    PParagraphe pp;
-    pc = pdebut->pc;
+    PCaractere py;
+    PParagraphe px;
     FILE *f = NULL;
     f = fopen("texte.txt", "r");
     fscanf(f, "%c", &test);
+    fclose(f);
+    f = fopen("texte.txt", "r");
     if(test==-1)
     {
         MessageBeep(MB_OK);
@@ -204,24 +207,35 @@ void ouvrir(PParagraphe pdebut) 		//A coder //Doit retourner la position du curs
     else
     {
         // -------------------------------------------- VIDER LA LISTE EXISTANTE
-        while (pp!=NULL)
-        {
-            while (i!=58)
-            {
-                fscanf(f,"%c;", &i);
-                pc=insertionCaractere(pc);
-                pc->info.c=i;
-            }
-            pp=insertionParagraphe(pp);
-        }
+        pdebut->ps=pfin;
+        pfin->pp=pdebut;
+        pdebut->numeroParagraphe=-1;
+		px=pdebut;
+        
+        do {
+        	px=insertionParagraphe(px);
+        	px->numeroParagraphe=px->pp->numeroParagraphe+1;
+        	py=px->pc;
+            do {
+                fscanf(f,"%c", &i);
+                if(i!=42 && i!=58 && i!=59) {						//i=42 => *
+                	py=insertionCaractere(py);
+                	py->info.c=i;
+                	printf("%c", i);
+				}
+                
+            }while(i!=58 && i!=42);						//i=58 => :
+            printf("\n");
+        }while(i!=42);
+        
+        
     }
 }
 
 
 
 
-int main()
-{
+int main() {
 	int i;
 	int posX,posY;
 	PParagraphe pdebut, pfin, px;						//px est le pointeur du paragraphe courant
@@ -247,7 +261,7 @@ int main()
 	  	i=lireCaract();
 
 		//Pas de verification de bornes sur X et Y
-
+		
 	  	if (i==13) {				//Entree
 			posX=posX+1;
 			posY=0;
@@ -258,28 +272,46 @@ int main()
 		}
 		else if (i==472) {				//Fleche haut
 			posX=posX-1;
+			if(posX<0) {
+				posX=0;
+			}
      	    positionChar(posX,posY);
 		}
 		else if (i==475) {				//Fleche gauche
-			posX=posX;
 			posY=posY-1;
+			if(posY<0) {
+				posY=0;
+			}
 			positionChar(posX,posY);
 		}
 		else if (i==477) {				//Fleche droite
-			posX=posX;
 			posY=posY+1;
+			if(py->cs==NULL) {
+				
+			}
 			positionChar(posX,posY);
 		}
 		else if (i==480) {				//Fleche bas
 			posX=posX+1;
-			posY;
+			if(posX==px->numeroParagraphe) {
+				posX--;
+			}
 			positionChar(posX,posY);
 		}
     	else if (i==19) {				//CTRL + S
 			enregistrer(hConsole, pdebut, pfin);
 		}
     	else if (i==15) {				//CTRL + O
-//			ouvrir();
+			ouvrir(pdebut, pfin);
+			px=pfin->pp;	//Px sur dernier para
+			py=px->pc;		//Py sur dernier caract
+			posY=0;
+			while(py->cs!=NULL) {
+				py=py->cs;
+				posY=posY++;
+			}
+			posX=px->numeroParagraphe-1;
+			
 		}
     	else if (i==4) {				//CTRL + D
 			selectionner();
@@ -306,6 +338,6 @@ int main()
 
 	positionChar(29,0);
 
-
+	return 0;
 
 }
