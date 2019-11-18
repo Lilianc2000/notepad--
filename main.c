@@ -69,7 +69,19 @@ PCaractere insertionCaractere(PCaractere px) {		//Fonctionne
 	PCaractere py=(PCaractere)malloc(sizeof(TSuiteCaractere));
 	py->cs=px->cs;
 	px->cs=py;
+	px->cs->cs=NULL;
 	return px->cs;
+}
+
+//Retourne la quantite de caractere dans le paragraphe px
+int quantiteCaractere(PParagraphe px) {
+	int i=0;
+	PCaractere py=px->pc;
+	while(py->cs!=NULL) {
+		i++;
+		py=py->cs;
+	}
+	return i;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
@@ -138,8 +150,10 @@ void enregistrer(HANDLE hConsole, PParagraphe pdebut, PParagraphe pfin) 	//Fonct
                     fprintf(f, "%c;", py->info.c);
                     py=py->cs;
                 }
-                fprintf(f, ":");
                 px=px->ps;
+                if(px!=pfin) {
+                	fprintf(f, ":");
+				}
             }
 			fprintf(f, "*");
             MessageBeep(MB_OK);
@@ -164,17 +178,19 @@ void enregistrer(HANDLE hConsole, PParagraphe pdebut, PParagraphe pfin) 	//Fonct
         //Ecriture des donnees
         px=pdebut->ps;
         while(px!=pfin)
-        {
-            py=px->pc->cs;
-            while(py!=NULL)
             {
-                fprintf(f, "%c;", py->info.c);
-                py=py->cs;
+                py=px->pc->cs;
+                while(py!=NULL)
+                {
+                    fprintf(f, "%c;", py->info.c);
+                    py=py->cs;
+                }
+                px=px->ps;
+                if(px!=pfin) {
+                	fprintf(f, ":");
+				}
             }
-            fprintf(f, ":");
-            px=px->ps;
-        }
-		fprintf(f, "*");
+			fprintf(f, "*");
 		
     	MessageBeep(MB_OK);
         MessageBox(NULL, TEXT("Fichier enregistre sous : texte.txt"), TEXT("Enregistrer"),MB_OK);
@@ -190,7 +206,7 @@ void selectionner() 		//A coder
 }
 
 //Doit retourner la position du curseur ? Impossible de retourner PParagraphe ET Pcaractere
-void ouvrir(PParagraphe pdebut, PParagraphe pfin) {		//A coder
+void ouvrir(PParagraphe pdebut, PParagraphe pfin) {		//A tester
     int test = -1, i=0;
     PCaractere py;
     PParagraphe px;
@@ -225,7 +241,9 @@ void ouvrir(PParagraphe pdebut, PParagraphe pfin) {		//A coder
 				}
                 
             }while(i!=58 && i!=42);						//i=58 => :
-            printf("\n");
+            if(i!=42) {
+            	printf("\n");
+			}
         }while(i!=42);
         
         
@@ -262,19 +280,28 @@ int main() {
 
 		//Pas de verification de bornes sur X et Y
 		
-	  	if (i==13) {				//Entree
+	  	if (i==13) {					//Entree
 			posX=posX+1;
 			posY=0;
-			positionChar(posX,posY);
 			//Insertion d un nouveau paragraphe apres px
 			px=insertionParagraphe(px);
 			py=px->pc;
+			
+			position(posX,posY);
+     	    positionChar(posX,posY);
 		}
 		else if (i==472) {				//Fleche haut
 			posX=posX-1;
 			if(posX<0) {
 				posX=0;
 			}
+			//Si ligne au dessus plus courte
+			if(posX!=0 && posY>quantiteCaractere(pointeurPositionParagraphe(posX, pdebut))) {
+				posY=quantiteCaractere(pointeurPositionParagraphe(posX+1, pdebut));
+			}
+			px=pointeurPositionParagraphe(posX+1, pdebut);
+			py=pointeurPositionCaractere(posY+1, px->pc);
+			position(posX,posY);
      	    positionChar(posX,posY);
 		}
 		else if (i==475) {				//Fleche gauche
@@ -282,26 +309,43 @@ int main() {
 			if(posY<0) {
 				posY=0;
 			}
+			px=pointeurPositionParagraphe(posX+1, pdebut);
+			py=pointeurPositionCaractere(posY-1, px->pc);
+			position(posX,posY);
 			positionChar(posX,posY);
 		}
 		else if (i==477) {				//Fleche droite
-			posY=posY+1;
+			posY++;
+			//Si arrive en bout de paragraphe
 			if(py->cs==NULL) {
-				
+				posY--;
 			}
+			px=pointeurPositionParagraphe(posX+1, pdebut);
+			py=pointeurPositionCaractere(posY, px->pc);
+			position(posX,posY);
 			positionChar(posX,posY);
 		}
 		else if (i==480) {				//Fleche bas
 			posX=posX+1;
-			if(posX==px->numeroParagraphe) {
+			//Si arrive en bout de doc
+			if(posX==pfin->pp->numeroParagraphe) {
 				posX--;
 			}
+			//Si ligne en dessous plus courte
+			if(1) {
+					
+			}
+			px=pointeurPositionParagraphe(posX+1, pdebut);
+			py=pointeurPositionCaractere(posY-1, px->pc);
+			position(posX,posY);
 			positionChar(posX,posY);
 		}
     	else if (i==19) {				//CTRL + S
+    		//Sauvegarder dans un fichier
 			enregistrer(hConsole, pdebut, pfin);
 		}
     	else if (i==15) {				//CTRL + O
+    		//Ouvrir depuis un fichier
 			ouvrir(pdebut, pfin);
 			px=pfin->pp;	//Px sur dernier para
 			py=px->pc;		//Py sur dernier caract
@@ -311,7 +355,8 @@ int main() {
 				posY=posY++;
 			}
 			posX=px->numeroParagraphe-1;
-			
+			positionChar(posX,posY);
+			position(posX, posY);
 		}
     	else if (i==4) {				//CTRL + D
 			selectionner();
@@ -333,8 +378,7 @@ int main() {
 		  	affiche(hConsole, i, fond, couleur);
 		  	posY=posY+1;
 	   }
-
-  }
+	}
 
 	positionChar(29,0);
 
