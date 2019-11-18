@@ -302,8 +302,8 @@ int main() {
 			px=insertionParagraphe(px);
 			py=px->pc;
 			
-			position(posX,posY);
-     	    positionChar(posX,posY);
+			position(posX,posY,hConsole);
+     	    		positionChar(posX,posY);
 		}
 		else if (i==472) {				//Fleche haut
 			posX--;
