@@ -388,7 +388,8 @@ int main() {
 			positionChar(posX,posY);
 
 			//Enregistrement du caractere tape dans le paragraphe
-			if(a!=1){py=insertionCaractere(py);a=0;}
+			if(a!=1){py=insertionCaractere(py);}
+			else{a=0;}
 			py->info.c=i;
 			px->quantiteCaractere=px->quantiteCaractere+1;
 		  	affiche(hConsole, i, fond, couleur);
