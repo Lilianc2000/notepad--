@@ -88,7 +88,10 @@ int quantiteCaractere(PParagraphe px) {
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
-int tailleFenetre(HANDLE hConsole){
+short tailleFenetre(HANDLE hConsole, short taille){
+	positionChar(taille, 0);
+	printf("                         ");
+	positionChar(taille, 0);
 	CONSOLE_SCREEN_BUFFER_INFO info;
 	short rows;
 	short columns;
@@ -117,7 +120,6 @@ int lireCaract(){		//Fonctionne
 void positionChar( int lig, int col ){		//Fonctionne
 	// ressources
 	COORD mycoord;
-
 	mycoord.X = col;
 	mycoord.Y = lig;
 	SetConsoleCursorPosition( GetStdHandle( STD_OUTPUT_HANDLE ), mycoord );
@@ -125,14 +127,13 @@ void positionChar( int lig, int col ){		//Fonctionne
 
 void affiche(HANDLE hConsole, char c,int fond, int couleur){
 	int i;
-
 	i=16*fond+couleur;
 	SetConsoleTextAttribute(hConsole, i);
     printf("%c", c);
 }
 
-void position(int posX,int posY, HANDLE hConsole){		//Fonctionne
-	positionChar(tailleFenetre(hConsole),0);
+void position(int posX,int posY, HANDLE hConsole, short taille){		//Fonctionne
+	positionChar(tailleFenetre(hConsole, taille),0);
 	printf("posX : %3d  posY : %3d", posX,posY);
 }
 
@@ -207,7 +208,7 @@ void enregistrer(HANDLE hConsole, PParagraphe pdebut, PParagraphe pfin) 	//Fonct
 				}
             }
 			fprintf(f, "*");
-		
+
     	MessageBeep(MB_OK);
         MessageBox(NULL, TEXT("Fichier enregistre sous : texte.txt"), TEXT("Enregistrer"),MB_OK);
         fclose(f);
@@ -242,7 +243,7 @@ void ouvrir(PParagraphe pdebut, PParagraphe pfin) {		//A tester
         pfin->pp=pdebut;
         pdebut->numeroParagraphe=-1;
 		px=pdebut;
-        
+
         do {
         	px=insertionParagraphe(px);
         	px->numeroParagraphe=px->pp->numeroParagraphe+1;
@@ -255,14 +256,14 @@ void ouvrir(PParagraphe pdebut, PParagraphe pfin) {		//A tester
                 	px->quantiteCaractere++;
                 	printf("%c", i);
 				}
-                
+
             }while(i!=58 && i!=42);						//i=58 => :
             if(i!=42) {
             	printf("\n");
 			}
         }while(i!=42);
-        
-        
+
+
     }
 }
 
@@ -275,7 +276,7 @@ int main() {
 	PCaractere py;										//py est le pointeur du caractere courant
 	int fond,couleur;
   	HANDLE hConsole=GetStdHandle(STD_OUTPUT_HANDLE);
-
+    short taille = tailleFenetre(hConsole,0);
 	fond=0;couleur=15;
 	i=0;posX=0;posY=0;
 
@@ -294,15 +295,15 @@ int main() {
 	  	i=lireCaract();
 
 		//Pas de verification de bornes sur X et Y
-		
+
 	  	if (i==13) {					//Entree
 			posX=posX+1;
 			posY=0;
 			//Insertion d un nouveau paragraphe apres px
 			px=insertionParagraphe(px);
 			py=px->pc;
-			
-			position(posX,posY, hConsole);
+
+			position(posX,posY,hConsole,taille);
      	    positionChar(posX,posY);
 		}
 		else if (i==472) {				//Fleche haut posX--
@@ -310,8 +311,8 @@ int main() {
 				posX--;
 				px=px->pp;
 			}
-			
-			position(posX,posY,hConsole); positionChar(posX,posY);
+
+			position(posX,posY,hConsole,taille); positionChar(posX,posY);
 		}
 		else if (i==475) {				//Fleche gauche posY--
 			if(posY>=1) {
@@ -322,24 +323,24 @@ int main() {
 					py=pointeurPositionCaractere(posY, px->pc->cs);
 				}
 			}
-			
-			position(posX,posY,hConsole); positionChar(posX,posY);
+
+			position(posX,posY,hConsole,taille); positionChar(posX,posY);
 		}
 		else if (i==477) {				//Fleche droite posY++
 			if(posY<quantiteCaractere(px)) {
 				posY++;
 				py=py->cs;
 			}
-			
-			position(posX,posY,hConsole); positionChar(posX,posY);
+
+			position(posX,posY,hConsole,taille); positionChar(posX,posY);
 		}
 		else if (i==480) {				//Fleche bas posX++
 			if(px->ps!=pfin) {
 				posX++;
 				px=px->ps;
 			}
-			
-			position(posX,posY,hConsole); positionChar(posX,posY);
+
+			position(posX,posY,hConsole,taille); positionChar(posX,posY);
 		}
 		else if (i==19) {				//CTRL + S
     		//Sauvegarder dans un fichier
@@ -357,7 +358,7 @@ int main() {
 			}
 			posX=px->numeroParagraphe-1;
 			positionChar(posX,posY);
-			position(posX, posY,hConsole);
+			position(posX, posY,hConsole,taille);
 		}
     	else if (i==4) {				//CTRL + D
 			selectionner();
@@ -369,7 +370,7 @@ int main() {
 
 		else if (i==3) {}				// touche CTRL + C sortir du programme
 		else {				//Affiche le caractere courant
-		  	position(posX,posY,hConsole);
+		  	position(posX,posY,hConsole,taille);
 			positionChar(posX,posY);
 
 			//Enregistrement du caractere tape dans le paragraphe
