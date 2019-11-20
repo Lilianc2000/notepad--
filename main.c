@@ -270,6 +270,7 @@ void ouvrir(PParagraphe pdebut, PParagraphe pfin) {		//A tester
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 int main() {
+	SetConsoleTitle("Notepad--");
 	int i;
 	int posX,posY;
 	PParagraphe pdebut, pfin, px;						//px est le pointeur du paragraphe courant
