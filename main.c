@@ -368,12 +368,15 @@ int main() {
 		}
 
 		else if (i==8){                 //Backspace
-		    a=1;
-            py->info.c=NULL;
-            posY=posY-1;
-            position(posX,posY,hConsole,taille);
-            affiche(hConsole, 0, fond, couleur);
-            px->quantiteCaractere=px->quantiteCaractere-1;
+			if (a==1){                  //Si un backspace à été entrée précédemment
+               			 py=pointeurPositionCaractere(posY-1,px); //On se place sur la case d'avant
+		   	 }
+		  	 a=1;
+            		 py->info.c=NULL;
+           		 posY=posY-1;
+           		 position(posX,posY,hConsole,taille);
+          		 affiche(hConsole, 0, fond, couleur);
+          		 px->quantiteCaractere=px->quantiteCaractere-1;
 		}
 //		else if (i==560){fond=0;couleur=15;} 												// touche F2
 //		else if (i==561){fond=10;couleur=15;} 												// touche F3
