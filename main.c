@@ -77,10 +77,10 @@ PCaractere insertionCaractere(PCaractere px) {		//Fonctionne
     return px->cs;
 }
 
-//Retourne la quantite de caractere dans le paragraphe px
-int quantiteCaractere(PParagraphe px) {		//Fonctionne
+//Retourne la quantite de caractere dans le paragraphe px, il faut donner px->pc
+int quantiteCaractere(PCaractere pc) {		//Fonctionne
     int i=0;
-    PCaractere py=px->pc;
+    PCaractere py=pc;
     while(py->cs!=NULL)
     {
         i++;
@@ -251,7 +251,7 @@ PCaractere selectionner(PCaractere py, int posX,int posY, HANDLE hConsole, short
     while (i!=6){
         i = lireCaract();
         if (i==477){
-            if(posY<quantiteCaractere(px))
+            if(posY<quantiteCaractere(px->pc))
             {
                 posY++;
                 pz=pz->cs;
@@ -343,10 +343,38 @@ void ouvrir(PParagraphe pdebut, PParagraphe pfin) {		//Fonctionne
     }
 }
 
-//Deplace toutes les cases caracteres entre pyA (inclus) et pyB (inclus) dans la liste de pPoubelle la liste poubelle
-PCaractere deplacementPoubelle() {		//A coder
-	
-	return NULL;
+//Deplace le paragraphe px dans la liste pPoubelleParagraphe et retourne py le paragraphe avant px
+PParagraphe deplacementParagraphe(PParagraphe px, PParagraphe pPoubelleParagrapheFin) {		//A tester
+	PParagraphe py=px->pp;
+	px->ps->pp=py;
+	py->ps=px->ps;
+	pPoubelleParagrapheFin->pp->ps=px;
+	px->ps=pPoubelleParagrapheFin;
+	px->pp=pPoubelleParagrapheFin->pp;
+	pPoubelleParagrapheFin->pp=px;
+	return py;
+}
+
+//Deplace toutes les cases caracteres entre pA (exclus) et pB (inclus) dans la liste pPoubelle appropriee, px correspond au paragraphe contenant pA
+void deplacementPoubelle(PParagraphe px, PCaractere pA, PCaractere pB, PParagraphe pPoubelleParagrapheFin, PCaractere pPoubelleCaractere) {		//A coder
+	//pointeurPositionCaractere(quantiteCaractere(pPoubelleCaractere), pPoubelleCaractere)  => pointeur du dernier caractere dans la poubelle caractere
+	PCaractere py;
+	while(pA!=pB) {
+		if(pA->cs==NULL) {		//Si il n y a pas de caractere apres pA
+			//On passe au paragraphe suivant, on recolle le premier caractere apres pA et on retire le paragraphe vide
+			pA->cs=px->ps->pc->cs;		//Deplacement des caracteres du paragraphe suivant apres pA
+			pointeurPositionCaractere(quantiteCaractere(pPoubelleCaractere), pPoubelleCaractere)->cs=px->ps->pc; //Deplacement du bidon du paragraphe suivant dans la poubelle caractere
+			px=deplacementParagraphe(px->ps, pPoubelleParagrapheFin);		//Deplacement du paragraphe vide dans la poubelle paragraphe
+		}
+		py=pA->cs;
+		if(py->cs==NULL) {		//Si py en bout de paragraphe
+			pA->cs=NULL;
+		} else {
+			pA->cs=py->cs;
+		}
+		pointeurPositionCaractere(quantiteCaractere(pPoubelleCaractere), pPoubelleCaractere)->cs=py;
+		py->cs=NULL;
+	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -355,8 +383,8 @@ int main() {
     SetConsoleTitle("Notepad--");
     int i, a=0;
     int posX,posY;
-    PParagraphe pdebut, pfin, px;						//px est le pointeur du paragraphe courant
-    PCaractere py;										//py est le pointeur du caractere courant
+    PParagraphe pdebut, pfin, px, pPoubelleParagrapheDebut, pPoubelleParagrapheFin;			//px est le pointeur du paragraphe courant
+    PCaractere py, pPoubelleCaractere;														//py est le pointeur du caractere courant
 	int fond,couleur;
     HANDLE hConsole=GetStdHandle(STD_OUTPUT_HANDLE);
     short taille = tailleFenetre(hConsole,0);
@@ -372,7 +400,13 @@ int main() {
     pdebut->ps=pfin;
     pfin->pp=pdebut;
 	
-	//Creation de la liste poubelle
+	//Creation des listes de poubelle
+	pPoubelleParagrapheDebut=(PParagraphe)malloc(sizeof(TSuiteParagraphe));
+	pPoubelleParagrapheFin=(PParagraphe)malloc(sizeof(TSuiteParagraphe));
+	pPoubelleParagrapheDebut->ps=pPoubelleParagrapheFin;
+	pPoubelleParagrapheFin->pp=pPoubelleParagrapheDebut;
+	pPoubelleCaractere=(PCaractere)malloc(sizeof(TSuiteCaractere));
+	pPoubelleCaractere->cs=NULL;
 	
     //Creation du 1ier paragraphe
     px=insertionParagraphe(pdebut);
@@ -454,20 +488,20 @@ int main() {
         }
         else if (i==4)  				//CTRL + D
         {
-            selectionner(py,posX,posY,hConsole,taille,px);
+            selectionner(py, posX, posY, hConsole, taille, px);
         }
 
         else if (i==8)                  //Backspace
         {
             if (a==1)                   //Si un backspace à été entrée précédemment
             {
-                py=pointeurPositionCaractere(posY-1, px->pc); //On se place sur la case d'avant
-                //Placer un pointeur sur la case d'avant !!!!!!! //mdr mwa jveux bien
+                py=pointeurPositionCaractere(posY-1, px->pc);		//On se place sur la case d'avant
             }
-            //Deplacer la case caractere "supprimee" dans la liste poubelle avec deplacementPoubelle()
             a=1;
-            //py->info.c=NULL;		//Incorrect
-            posY=posY-1;
+            if(posY!=0) {		//Si on veut supprimer un caractere autre que retour a la ligne
+            	//deplacementPoubelle(px, py, py->cs, pPoubelleParagrapheFin, pPoubelleCaractere);
+			}
+            posY--;
             position(posX,posY,hConsole,taille);
             affiche(hConsole, 0, fond, couleur);
             px->quantiteCaractere=px->quantiteCaractere-1;
@@ -483,12 +517,9 @@ int main() {
             positionChar(posX,posY);
 
             //Enregistrement du caractere tape dans le paragraphe
-            if(a!=1)
-            {
+            if(a!=1) {
                 py=insertionCaractere(py);
-            }
-            else
-            {
+            } else {
                 a=0;
             }
             py->info.c=i;
