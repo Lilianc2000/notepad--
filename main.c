@@ -48,7 +48,9 @@ PCaractere pointeurPositionCaractere(int position, PCaractere pdebut) {		//Fonct
     int i=0;
     while(i<position)
     {
-        px=px->cs;
+    	if(px->cs!=NULL) {
+    		px=px->cs;
+		}
         i++;
     }
     return px;
@@ -356,7 +358,7 @@ PParagraphe deplacementParagraphe(PParagraphe px, PParagraphe pPoubelleParagraph
 }
 
 //Deplace toutes les cases caracteres entre pA (exclus) et pB (inclus) dans la liste pPoubelle appropriee, px correspond au paragraphe contenant pA
-void deplacementPoubelle(PParagraphe px, PCaractere pA, PCaractere pB, PParagraphe pPoubelleParagrapheFin, PCaractere pPoubelleCaractere) {		//A coder
+void deplacementPoubelle(PParagraphe px, PCaractere pA, PCaractere pB, PParagraphe pPoubelleParagrapheFin, PCaractere pPoubelleCaractere) {		//A tester
 	//pointeurPositionCaractere(quantiteCaractere(pPoubelleCaractere), pPoubelleCaractere)  => pointeur du dernier caractere dans la poubelle caractere
 	PCaractere py;
 	while(pA!=pB) {
@@ -493,14 +495,16 @@ int main() {
 
         else if (i==8)                  //Backspace
         {
-            if (a==1)                   //Si un backspace à été entrée précédemment
+            
+			
+			if (a==1)                   //Si un backspace à été entrée précédemment a==1
             {
                 py=pointeurPositionCaractere(posY-1, px->pc);		//On se place sur la case d'avant
             }
             a=1;
-            if(posY!=0) {		//Si on veut supprimer un caractere autre que retour a la ligne
-            	//deplacementPoubelle(px, py, py->cs, pPoubelleParagrapheFin, pPoubelleCaractere);
-			}
+            
+            //deplacementPoubelle(px, py, py->cs, pPoubelleParagrapheFin, pPoubelleCaractere);
+			
             posY--;
             position(posX,posY,hConsole,taille);
             affiche(hConsole, 0, fond, couleur);
