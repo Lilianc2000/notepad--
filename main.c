@@ -5,21 +5,18 @@
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
-typedef struct caractere
-{
+typedef struct caractere {
     char c;
     int fond;
     int couleur;
 } TCaractere;
 
-typedef struct suiteCaractere
-{
+typedef struct suiteCaractere {
     TCaractere info;
     struct suiteCaractere * cs;   			//caractereSuivant
 } TSuiteCaractere;
 
-typedef struct suiteParagraphe
-{
+typedef struct suiteParagraphe {
     int numeroParagraphe;
     int quantiteCaractere;
     struct suiteParagraphe * ps;			//paragrapheSuivant
@@ -34,10 +31,9 @@ typedef TSuiteCaractere * PCaractere;
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
 //Retourne le pointeur px de la case correspondante a la position donnee dans la liste paragraphe
-PParagraphe pointeurPositionParagraphe(int position, PParagraphe pdebut)  		//Fonctionne
-{
+PParagraphe pointeurPositionParagraphe(int position, PParagraphe pdebut) {		//Fonctionne 
     PParagraphe px=pdebut->ps;
-    int i=1;
+    int i=0;
     while(i<position)
     {
         px=px->ps;
@@ -47,8 +43,7 @@ PParagraphe pointeurPositionParagraphe(int position, PParagraphe pdebut)  		//Fo
 }
 
 //Retourne le pointeur px de la case correspondante a la position donne d un caractere dans un paragraphe
-PCaractere pointeurPositionCaractere(int position, PCaractere pdebut)  			//Fonctionne
-{
+PCaractere pointeurPositionCaractere(int position, PCaractere pdebut) {		//Fonctionne
     PCaractere px=pdebut;
     int i=0;
     while(i<position)
@@ -60,8 +55,7 @@ PCaractere pointeurPositionCaractere(int position, PCaractere pdebut)  			//Fonc
 }
 
 //Insertion d un nouveau paragraphe dans la liste paragraphe apres la case px, retourne le pointeur de la case creee
-PParagraphe insertionParagraphe(PParagraphe px)  		//Fonctionne
-{
+PParagraphe insertionParagraphe(PParagraphe px) {		//Fonctionne
     px->ps->pp=(PParagraphe)malloc(sizeof(TSuiteParagraphe));
     px->ps->pp->ps=px->ps;
     px->ps->pp->pp=px;
@@ -75,8 +69,7 @@ PParagraphe insertionParagraphe(PParagraphe px)  		//Fonctionne
 }
 
 //Insertion d un nouveau caractere dans la liste caractere apres la case px, retourne le pointeur de la case cree
-PCaractere insertionCaractere(PCaractere px)  		//Fonctionne
-{
+PCaractere insertionCaractere(PCaractere px) {		//Fonctionne
     PCaractere py=(PCaractere)malloc(sizeof(TSuiteCaractere));
     py->cs=px->cs;
     px->cs=py;
@@ -85,8 +78,7 @@ PCaractere insertionCaractere(PCaractere px)  		//Fonctionne
 }
 
 //Retourne la quantite de caractere dans le paragraphe px
-int quantiteCaractere(PParagraphe px)
-{
+int quantiteCaractere(PParagraphe px) {		//Fonctionne
     int i=0;
     PCaractere py=px->pc;
     while(py->cs!=NULL)
@@ -97,11 +89,21 @@ int quantiteCaractere(PParagraphe px)
     return i;
 }
 
+//Retourne la quantite de paragraphe dans la liste de paragraphe
+int quantiteParagraphe(PParagraphe pdebut, PParagraphe pfin) {		//Fonctionne
+	PParagraphe px=pdebut->ps;
+	int i=0;
+	while(px!=pfin) {
+		px=px->ps;
+		i++;
+	}
+	return i;
+}
+
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
 //Retourne la valeur decimale ASCII du caractere tape au clavier
-int lireCaract() 		//Fonctionne
-{
+int lireCaract() {		//Fonctionne
 
     char c=10;
     int fnt=0;
@@ -122,8 +124,7 @@ int lireCaract() 		//Fonctionne
 }
 
 //Deplace le curseur de la souris sur les coordonnes (x,y)
-void positionChar(int lig, int col) 		//Fonctionne
-{
+void positionChar(int lig, int col) {		//Fonctionne
     // ressources
     COORD mycoord;
     mycoord.X = col;
@@ -132,8 +133,7 @@ void positionChar(int lig, int col) 		//Fonctionne
 }
 
 //Affiche un caractere selon son code ASCII decimal, sa couleur de police et sa couleur de fond
-void affiche(HANDLE hConsole, char c,int fond, int couleur)
-{
+void affiche(HANDLE hConsole, char c,int fond, int couleur) {		//Fonctionne
     int i;
     i=16*fond+couleur;
     SetConsoleTextAttribute(hConsole, i);
@@ -141,8 +141,7 @@ void affiche(HANDLE hConsole, char c,int fond, int couleur)
 }
 
 //Retourne la quantite de lignes pouvant etre affichee par la fenetre de commande
-short tailleFenetre(HANDLE hConsole, short taille)
-{
+short tailleFenetre(HANDLE hConsole, short taille) {		//Fonctionne
     positionChar(taille, 0);
     printf("                         ");
     positionChar(taille, 0);
@@ -160,16 +159,14 @@ short tailleFenetre(HANDLE hConsole, short taille)
 }
 
 //Affiche les valeurs de posY et posX en bas de fenetre
-void position(int posX,int posY, HANDLE hConsole, short taille) 		//Fonctionne
-{
+void position(int posX,int posY, HANDLE hConsole, short taille) {		//Fonctionne
     positionChar(tailleFenetre(hConsole, taille),0);
     printf("posX : %3d  posY : %3d", posX,posY);
     positionChar(posX,posY);
 }
 
 //Sauvegarde les donnes des listes dans le fichier texte.txt dans le repertoire d execution de l application
-void enregistrer(HANDLE hConsole, PParagraphe pdebut, PParagraphe pfin) 	//Fonctionne
-{
+void enregistrer(HANDLE hConsole, PParagraphe pdebut, PParagraphe pfin) {		//Fonctionne
     PParagraphe px;
     PCaractere py;
     int test = -1;
@@ -248,8 +245,7 @@ void enregistrer(HANDLE hConsole, PParagraphe pdebut, PParagraphe pfin) 	//Fonct
 }
 
 //Retourne 
-PCaractere selectionner(PCaractere py, int posX,int posY, HANDLE hConsole, short taille, PParagraphe px) 		//A coder
-{
+PCaractere selectionner(PCaractere py, int posX,int posY, HANDLE hConsole, short taille, PParagraphe px) {		//A coder
     PCaractere pz = py;
     int i = -1, fond=0, couleur=15;
     while (i!=6){
@@ -296,8 +292,7 @@ PCaractere selectionner(PCaractere py, int posX,int posY, HANDLE hConsole, short
 }
 
 //Affiche le texte sauvegarde dans le fichier texte.txt
-void ouvrir(PParagraphe pdebut, PParagraphe pfin)  		//A tester
-{
+void ouvrir(PParagraphe pdebut, PParagraphe pfin) {		//Fonctionne
     int test = -1, i=0;
     PCaractere py;
     PParagraphe px;
@@ -348,102 +343,92 @@ void ouvrir(PParagraphe pdebut, PParagraphe pfin)  		//A tester
     }
 }
 
+//Deplace toutes les cases caracteres entre pyA (inclus) et pyB (inclus) dans la liste de pPoubelle la liste poubelle
+PCaractere deplacementPoubelle() {		//A coder
+	
+	return NULL;
+}
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-int main()
-{
+int main() {
     SetConsoleTitle("Notepad--");
     int i, a=0;
     int posX,posY;
     PParagraphe pdebut, pfin, px;						//px est le pointeur du paragraphe courant
     PCaractere py;										//py est le pointeur du caractere courant
-    int fond,couleur;
+	int fond,couleur;
     HANDLE hConsole=GetStdHandle(STD_OUTPUT_HANDLE);
     short taille = tailleFenetre(hConsole,0);
     fond=0;
     couleur=15;
     i=0;
-    posX=0;
-    posY=0;
+    posX=0;												//Coordonnee sur les lignes / en ordonnee
+    posY=0;												///Coordonnee sur les colonnes / en abscisse
 
     //Creation de la liste paragraphe
     pdebut=(PParagraphe)malloc(sizeof(TSuiteParagraphe));
     pfin=(PParagraphe)malloc(sizeof(TSuiteParagraphe));
     pdebut->ps=pfin;
     pfin->pp=pdebut;
-
+	
+	//Creation de la liste poubelle
+	
     //Creation du 1ier paragraphe
     px=insertionParagraphe(pdebut);
-    px->numeroParagraphe=posX+1;
+    px->numeroParagraphe=posX;
     py=px->pc;
 
     while (i!=3)  				//CTRL + C
     {
-        i=lireCaract();
-
-        //Pas de verification de bornes sur X et Y
-
+        //Verification de posX et posY, si hors limites ou valeurs interdites
+        if(posY<0) {		//Si trop a gauche
+        	posY=0;
+		}
+        if(posX<0) {		//Si trop en haut
+        	posX=0;
+		}
+		if(posX>=quantiteParagraphe(pdebut, pfin)) {		//Si trop en bas
+        	posX=quantiteParagraphe(pdebut, pfin)-1;
+		}
+		px=pointeurPositionParagraphe(posX, pdebut);
+        if(posY>px->quantiteCaractere) {		//Si trop a droite
+        	posY=px->quantiteCaractere;
+		}
+        py=pointeurPositionCaractere(posY, px->pc);
+        position(posX, posY, hConsole, taille);
+        positionChar(posX, posY);
+		
+		///Lecture du caractere tape au clavier
+		i=lireCaract();
+		
         if (i==13)  					//Entree
         {
-            posX=posX+1;
+            posX++;
             posY=0;
             //Insertion d un nouveau paragraphe apres px
             px=insertionParagraphe(px);
+            px->numeroParagraphe=posX;
             py=px->pc;
 
-            position(posX,posY,hConsole,taille);
-            positionChar(posX,posY);
+//            position(posX,posY,hConsole,taille);
+//            positionChar(posX,posY);
         }
         else if (i==472)  				//Fleche haut posX--
         {
-            if(posX>=1)
-            {
-                posX--;
-                px=px->pp;
-            }
-
-            position(posX,posY,hConsole,taille);
-            positionChar(posX,posY);
+            posX--;
         }
         else if (i==475)  				//Fleche gauche posY--
         {
-            if(posY>=1)
-            {
-                posY--;
-                if(posY==0)
-                {
-                    py=px->pc;
-                }
-                else
-                {
-                    py=pointeurPositionCaractere(posY, px->pc->cs);
-                }
-            }
-
-            position(posX,posY,hConsole,taille);
-            positionChar(posX,posY);
+            posY--;
         }
         else if (i==477)  				//Fleche droite posY++
         {
-            if(posY<quantiteCaractere(px))
-            {
-                posY++;
-                py=py->cs;
-            }
-
-            position(posX,posY,hConsole,taille);
-            positionChar(posX,posY);
+	        posY++;
         }
         else if (i==480)  				//Fleche bas posX++
         {
-            if(px->ps!=pfin)
-            {
-                posX++;
-                px=px->ps;
-            }
-
-            position(posX,posY,hConsole,taille);
-            positionChar(posX,posY);
+            posX++;
         }
         else if (i==19)  				//CTRL + S
         {
@@ -477,8 +462,9 @@ int main()
             if (a==1)                   //Si un backspace à été entrée précédemment
             {
                 py=pointeurPositionCaractere(posY-1, px->pc); //On se place sur la case d'avant
-                //Placer un pointeur sur la case d'avant !!!!!!!
+                //Placer un pointeur sur la case d'avant !!!!!!! //mdr mwa jveux bien
             }
+            //Deplacer la case caractere "supprimee" dans la liste poubelle avec deplacementPoubelle()
             a=1;
             //py->info.c=NULL;		//Incorrect
             posY=posY-1;
