@@ -99,24 +99,7 @@ int quantiteCaractere(PParagraphe px)
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
-short tailleFenetre(HANDLE hConsole, short taille)
-{
-    positionChar(taille, 0);
-    printf("                         ");
-    positionChar(taille, 0);
-    CONSOLE_SCREEN_BUFFER_INFO info;
-    short rows;
-    short columns;
-    hConsole = CreateFileW(L"CONOUT$", GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
-    if (GetConsoleScreenBufferInfo(hConsole, &info) == 0)
-        return 1;
-    CloseHandle(hConsole);
-    columns = info.srWindow.Right - info.srWindow.Left + 1;
-    rows = info.srWindow.Bottom - info.srWindow.Top;
-//	wprintf(L"%d columns by %d rows\n", columns, rows);
-    return rows;
-}
-
+//Retourne la valeur decimale ASCII du caractere tape au clavier
 int lireCaract() 		//Fonctionne
 {
 
@@ -138,7 +121,8 @@ int lireCaract() 		//Fonctionne
     return fnt;
 }
 
-void positionChar( int lig, int col ) 		//Fonctionne
+//Deplace le curseur de la souris sur les coordonnes (x,y)
+void positionChar(int lig, int col) 		//Fonctionne
 {
     // ressources
     COORD mycoord;
@@ -147,6 +131,7 @@ void positionChar( int lig, int col ) 		//Fonctionne
     SetConsoleCursorPosition( GetStdHandle( STD_OUTPUT_HANDLE ), mycoord );
 }
 
+//Affiche un caractere selon son code ASCII decimal, sa couleur de police et sa couleur de fond
 void affiche(HANDLE hConsole, char c,int fond, int couleur)
 {
     int i;
@@ -155,6 +140,26 @@ void affiche(HANDLE hConsole, char c,int fond, int couleur)
     printf("%c", c);
 }
 
+//Retourne la quantite de lignes pouvant etre affichee par la fenetre de commande
+short tailleFenetre(HANDLE hConsole, short taille)
+{
+    positionChar(taille, 0);
+    printf("                         ");
+    positionChar(taille, 0);
+    CONSOLE_SCREEN_BUFFER_INFO info;
+    short rows;
+    short columns;
+    hConsole = CreateFileW(L"CONOUT$", GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
+    if (GetConsoleScreenBufferInfo(hConsole, &info) == 0)
+        return 1;
+    CloseHandle(hConsole);
+    columns = info.srWindow.Right - info.srWindow.Left + 1;
+    rows = info.srWindow.Bottom - info.srWindow.Top;
+//	wprintf(L"%d columns by %d rows\n", columns, rows);
+    return rows;
+}
+
+//Affiche les valeurs de posY et posX en bas de fenetre
 void position(int posX,int posY, HANDLE hConsole, short taille) 		//Fonctionne
 {
     positionChar(tailleFenetre(hConsole, taille),0);
@@ -162,7 +167,7 @@ void position(int posX,int posY, HANDLE hConsole, short taille) 		//Fonctionne
     positionChar(posX,posY);
 }
 
-//Sauvegarde les donnes des listes dans le fichier teste.txt dans le repertoire d execution de l application
+//Sauvegarde les donnes des listes dans le fichier texte.txt dans le repertoire d execution de l application
 void enregistrer(HANDLE hConsole, PParagraphe pdebut, PParagraphe pfin) 	//Fonctionne
 {
     PParagraphe px;
@@ -242,8 +247,7 @@ void enregistrer(HANDLE hConsole, PParagraphe pdebut, PParagraphe pfin) 	//Fonct
     }
 }
 
-
-
+//Retourne 
 PCaractere selectionner(PCaractere py, int posX,int posY, HANDLE hConsole, short taille, PParagraphe px) 		//A coder
 {
     PCaractere pz = py;
@@ -291,6 +295,7 @@ PCaractere selectionner(PCaractere py, int posX,int posY, HANDLE hConsole, short
     return pz;
 }
 
+//Affiche le texte sauvegarde dans le fichier texte.txt
 void ouvrir(PParagraphe pdebut, PParagraphe pfin)  		//A tester
 {
     int test = -1, i=0;
@@ -471,11 +476,11 @@ int main()
         {
             if (a==1)                   //Si un backspace à été entrée précédemment
             {
-                py=pointeurPositionCaractere(posY-1,px); //On se place sur la case d'avant
+                py=pointeurPositionCaractere(posY-1, px->pc); //On se place sur la case d'avant
                 //Placer un pointeur sur la case d'avant !!!!!!!
             }
             a=1;
-            py->info.c=NULL;
+            //py->info.c=NULL;		//Incorrect
             posY=posY-1;
             position(posX,posY,hConsole,taille);
             affiche(hConsole, 0, fond, couleur);
