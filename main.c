@@ -30,6 +30,29 @@ typedef TSuiteCaractere * PCaractere;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
+//Retourne la quantite de caractere dans le paragraphe px, il faut donner px->pc
+int quantiteCaractere(PCaractere pc) {		//Fonctionne
+    int i=0;
+    PCaractere py=pc;
+    while(py->cs!=NULL)
+    {
+        i++;
+        py=py->cs;
+    }
+    return i;
+}
+
+//Retourne la quantite de paragraphe dans la liste de paragraphe
+int quantiteParagraphe(PParagraphe pdebut, PParagraphe pfin) {		//Fonctionne
+	PParagraphe px=pdebut->ps;
+	int i=0;
+	while(px!=pfin) {
+		px=px->ps;
+		i++;
+	}
+	return i;
+}
+
 //Retourne le pointeur px de la case correspondante a la position donnee dans la liste paragraphe
 PParagraphe pointeurPositionParagraphe(int position, PParagraphe pdebut) {		//Fonctionne 
     PParagraphe px=pdebut->ps;
@@ -57,49 +80,43 @@ PCaractere pointeurPositionCaractere(int position, PCaractere pdebut) {		//Fonct
 }
 
 //Insertion d un nouveau paragraphe dans la liste paragraphe apres la case px, retourne le pointeur de la case creee
-PParagraphe insertionParagraphe(PParagraphe px) {		//Fonctionne
-    px->ps->pp=(PParagraphe)malloc(sizeof(TSuiteParagraphe));
+PParagraphe insertionParagraphe(PParagraphe px, PParagraphe pPoubelleParagrapheDebut, PParagraphe pPoubelleParagrapheFin, PCaractere pPoubelleCaractere) {		//Fonctionne
+	if(pPoubelleParagrapheDebut->ps!=pPoubelleParagrapheFin && pPoubelleParagrapheFin->pp!=pPoubelleParagrapheDebut) {		//Si la liste poubelle de paragraphe n est pas vide
+		px->ps->pp=pointeurPositionParagraphe(quantiteParagraphe(pPoubelleParagrapheDebut, pPoubelleParagrapheFin)-1, pPoubelleParagrapheDebut);
+		px->ps->pp->pp->ps=pPoubelleParagrapheFin;
+		pPoubelleParagrapheFin->pp=px->ps->pp->pp;
+	} else {
+		px->ps->pp=(PParagraphe)malloc(sizeof(TSuiteParagraphe));
+	}
+//	px->ps->pp=(PParagraphe)malloc(sizeof(TSuiteParagraphe));
     px->ps->pp->ps=px->ps;
     px->ps->pp->pp=px;
     px->ps=px->ps->pp;
     //Creation d un bidon pdebutC
-    PCaractere pdebutC=(PCaractere)malloc(sizeof(TSuiteCaractere));
+    if(pPoubelleCaractere->cs!=NULL) {		//Si la liste poubelle de caractere n est pas vide
+    	px->ps->pc=pointeurPositionCaractere(quantiteCaractere(pPoubelleCaractere), pPoubelleCaractere);
+    	pointeurPositionCaractere((quantiteCaractere(pPoubelleCaractere)-1), pPoubelleCaractere)->cs=NULL;
+	} else {
+		px->ps->pc=(PCaractere)malloc(sizeof(TSuiteCaractere));
+	}
     px->ps->quantiteCaractere=0;
-    px->ps->pc=pdebutC;
-    pdebutC->cs=NULL;
+    px->ps->pc->cs=NULL;
     return px->ps;
 }
 
 //Insertion d un nouveau caractere dans la liste caractere apres la case px, retourne le pointeur de la case cree
-PCaractere insertionCaractere(PCaractere px) {		//Fonctionne
-    PCaractere py=(PCaractere)malloc(sizeof(TSuiteCaractere));
+PCaractere insertionCaractere(PCaractere px, PCaractere pPoubelleCaractere) {		//Fonctionne
+	PCaractere py;
+    if(pPoubelleCaractere->cs!=NULL) {		//Si la liste poubelle de caractere n est pas vide
+    	py=pointeurPositionCaractere(quantiteCaractere(pPoubelleCaractere), pPoubelleCaractere);
+    	pointeurPositionCaractere(quantiteCaractere(pPoubelleCaractere)-1, pPoubelleCaractere)->cs=NULL;
+	} else {
+		py=(PCaractere)malloc(sizeof(TSuiteCaractere));
+	}
     py->cs=px->cs;
     px->cs=py;
     px->cs->cs=NULL;
     return px->cs;
-}
-
-//Retourne la quantite de caractere dans le paragraphe px, il faut donner px->pc
-int quantiteCaractere(PCaractere pc) {		//Fonctionne
-    int i=0;
-    PCaractere py=pc;
-    while(py->cs!=NULL)
-    {
-        i++;
-        py=py->cs;
-    }
-    return i;
-}
-
-//Retourne la quantite de paragraphe dans la liste de paragraphe
-int quantiteParagraphe(PParagraphe pdebut, PParagraphe pfin) {		//Fonctionne
-	PParagraphe px=pdebut->ps;
-	int i=0;
-	while(px!=pfin) {
-		px=px->ps;
-		i++;
-	}
-	return i;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
@@ -294,7 +311,7 @@ PCaractere selectionner(PCaractere py, int posX,int posY, HANDLE hConsole, short
 }
 
 //Affiche le texte sauvegarde dans le fichier texte.txt
-void ouvrir(PParagraphe pdebut, PParagraphe pfin) {		//Fonctionne
+void ouvrir(PParagraphe pdebut, PParagraphe pfin, PParagraphe pPoubelleParagrapheDebut, PParagraphe pPoubelleParagrapheFin, PCaractere pPoubelleCaractere) {		//Fonctionne
     int test = -1, i=0;
     PCaractere py;
     PParagraphe px;
@@ -318,7 +335,7 @@ void ouvrir(PParagraphe pdebut, PParagraphe pfin) {		//Fonctionne
 
         do
         {
-            px=insertionParagraphe(px);
+            px=insertionParagraphe(px, pPoubelleParagrapheDebut, pPoubelleParagrapheFin, pPoubelleCaractere);
             px->numeroParagraphe=px->pp->numeroParagraphe+1;
             py=px->pc;
             do
@@ -326,7 +343,7 @@ void ouvrir(PParagraphe pdebut, PParagraphe pfin) {		//Fonctionne
                 fscanf(f,"%c", &i);
                 if(i!=42 && i!=58 && i!=59)  						//i=42 => *
                 {
-                    py=insertionCaractere(py);
+                    py=insertionCaractere(py, pPoubelleCaractere);
                     py->info.c=i;
                     px->quantiteCaractere++;
                     printf("%c", i);
@@ -415,7 +432,7 @@ int main() {
 	pPoubelleCaractere->cs=NULL;
 	
     //Creation du 1ier paragraphe
-    px=insertionParagraphe(pdebut);
+    px=insertionParagraphe(pdebut, pPoubelleParagrapheDebut, pPoubelleParagrapheFin, pPoubelleCaractere);
     px->numeroParagraphe=posX;
     py=px->pc;
 
@@ -436,7 +453,7 @@ int main() {
         	posY=px->quantiteCaractere;
 		}
         py=pointeurPositionCaractere(posY, px->pc);
-        position(quantiteCaractere(pPoubelleCaractere), quantiteParagraphe(pPoubelleParagrapheDebut, pPoubelleParagrapheFin), hConsole, taille);		//position(quantiteCaractere(pPoubelleCaractere), quantiteParagraphe(pPoubelleParagrapheDebut, pPoubelleParagrapheFin), hConsole, taille);
+        position(posX, posY, hConsole, taille);		//position(quantiteCaractere(pPoubelleCaractere), quantiteParagraphe(pPoubelleParagrapheDebut, pPoubelleParagrapheFin), hConsole, taille); -> pour afficher les quantites de cases dans les poubelles
         positionChar(posX, posY);
 		
 		///Lecture du caractere tape au clavier
@@ -447,7 +464,7 @@ int main() {
             posX++;
             posY=0;
             //Insertion d un nouveau paragraphe apres px
-            px=insertionParagraphe(px);
+            px=insertionParagraphe(px, pPoubelleParagrapheDebut, pPoubelleParagrapheFin, pPoubelleCaractere);
             px->numeroParagraphe=posX;
             py=px->pc;
 
@@ -479,7 +496,7 @@ int main() {
         else if (i==15)  				//CTRL + O
         {
             //Ouvrir depuis un fichier
-            ouvrir(pdebut, pfin);
+            ouvrir(pdebut, pfin, pPoubelleParagrapheDebut, pPoubelleParagrapheFin, pPoubelleCaractere);
             px=pfin->pp;	//Px sur dernier para
             py=px->pc;		//Py sur dernier caract
             posY=0;
@@ -501,7 +518,7 @@ int main() {
         {
             
 			
-//			if (a==1)                   //Si un backspace à été entrée précédemment
+//			if (a==1)                   //Si un backspace à été entré précédemment
 //            {
 //                py=pointeurPositionCaractere(posY-1, px->pc);		//On se place sur la case d'avant
 //            }
@@ -541,7 +558,7 @@ int main() {
 //                a=0;
 //            }
             
-            py=insertionCaractere(py);
+            py=insertionCaractere(py, pPoubelleCaractere);
             
             py->info.c=i;
             px->quantiteCaractere=px->quantiteCaractere+1;
