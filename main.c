@@ -361,14 +361,18 @@ PParagraphe deplacementParagraphe(PParagraphe px, PParagraphe pPoubelleParagraph
 void deplacementPoubelle(PParagraphe px, PCaractere pA, PCaractere pB, PParagraphe pPoubelleParagrapheFin, PCaractere pPoubelleCaractere) {		//A tester
 	//pointeurPositionCaractere(quantiteCaractere(pPoubelleCaractere), pPoubelleCaractere)  => pointeur du dernier caractere dans la poubelle caractere
 	PCaractere py;
-	while(pA!=pB) {
+	int fin=0;
+	while(fin==0) {
 		if(pA->cs==NULL) {		//Si il n y a pas de caractere apres pA
 			//On passe au paragraphe suivant, on recolle le premier caractere apres pA et on retire le paragraphe vide
 			pA->cs=px->ps->pc->cs;		//Deplacement des caracteres du paragraphe suivant apres pA
-			pointeurPositionCaractere(quantiteCaractere(pPoubelleCaractere), pPoubelleCaractere)->cs=px->ps->pc; //Deplacement du bidon du paragraphe suivant dans la poubelle caractere
+			pointeurPositionCaractere(quantiteCaractere(pPoubelleCaractere), pPoubelleCaractere)->cs=px->ps->pc;		//Deplacement du bidon du paragraphe suivant dans la poubelle caractere
 			px=deplacementParagraphe(px->ps, pPoubelleParagrapheFin);		//Deplacement du paragraphe vide dans la poubelle paragraphe
 		}
 		py=pA->cs;
+		if(py==pB) {
+			fin=1;
+		}
 		if(py->cs==NULL) {		//Si py en bout de paragraphe
 			pA->cs=NULL;
 		} else {
@@ -432,7 +436,7 @@ int main() {
         	posY=px->quantiteCaractere;
 		}
         py=pointeurPositionCaractere(posY, px->pc);
-        position(posX, posY, hConsole, taille);
+        position(quantiteCaractere(pPoubelleCaractere), quantiteParagraphe(pPoubelleParagrapheDebut, pPoubelleParagrapheFin), hConsole, taille);		//position(quantiteCaractere(pPoubelleCaractere), quantiteParagraphe(pPoubelleParagrapheDebut, pPoubelleParagrapheFin), hConsole, taille);
         positionChar(posX, posY);
 		
 		///Lecture du caractere tape au clavier
@@ -497,18 +501,28 @@ int main() {
         {
             
 			
-			if (a==1)                   //Si un backspace à été entrée précédemment a==1
-            {
-                py=pointeurPositionCaractere(posY-1, px->pc);		//On se place sur la case d'avant
-            }
-            a=1;
-            
-            //deplacementPoubelle(px, py, py->cs, pPoubelleParagrapheFin, pPoubelleCaractere);
-			
-            posY--;
-            position(posX,posY,hConsole,taille);
-            affiche(hConsole, 0, fond, couleur);
-            px->quantiteCaractere=px->quantiteCaractere-1;
+//			if (a==1)                   //Si un backspace à été entrée précédemment
+//            {
+//                py=pointeurPositionCaractere(posY-1, px->pc);		//On se place sur la case d'avant
+//            }
+//            a=1;
+            if(posY!=0) {		//Si on n efface pas le retour a la ligne
+            	posY--;
+	            py=pointeurPositionCaractere(posY, px->pc);
+	            deplacementPoubelle(px, py, py->cs, pPoubelleParagrapheFin, pPoubelleCaractere);
+	            position(posX,posY,hConsole,taille);
+	            affiche(hConsole, 0, fond, couleur);
+	            px->quantiteCaractere=px->quantiteCaractere-1;
+			} else if(posY==0 && posX!=0) {		//Si on efface un retour a la ligne
+				posX--;
+				posY=quantiteCaractere(px->pp->pc);
+				if(px->pc->cs!=NULL) {		//Si paragraphe contient des caracteres, il faut recuperer son contenu
+					pointeurPositionCaractere(quantiteCaractere(px->pp->pc),  px->pp->pc)->cs=px->pc->cs;		//Deplacement des caracteres du paragraphe px apres le dernier caractere du paragraphe precedent
+				}
+				pointeurPositionCaractere(quantiteCaractere(pPoubelleCaractere), pPoubelleCaractere)->cs=px->pc;		//Deplacement du bidon dans la liste poubelle
+				px=deplacementParagraphe(px, pPoubelleParagrapheFin);		//Deplacement du paragraphe px dans la liste poubelle
+				py=pointeurPositionCaractere(posY, px->pc);
+			}
         }
 //		else if (i==560){fond=0;couleur=15;} 												// touche F2
 //		else if (i==561){fond=10;couleur=15;} 												// touche F3
@@ -521,11 +535,14 @@ int main() {
             positionChar(posX,posY);
 
             //Enregistrement du caractere tape dans le paragraphe
-            if(a!=1) {
-                py=insertionCaractere(py);
-            } else {
-                a=0;
-            }
+//            if(a!=1) {
+//                py=insertionCaractere(py);
+//            } else {
+//                a=0;
+//            }
+            
+            py=insertionCaractere(py);
+            
             py->info.c=i;
             px->quantiteCaractere=px->quantiteCaractere+1;
             affiche(hConsole, i, fond, couleur);
