@@ -135,6 +135,7 @@ void affiche(HANDLE hConsole, char c,int fond, int couleur){
 void position(int posX,int posY, HANDLE hConsole, short taille){		//Fonctionne
 	positionChar(tailleFenetre(hConsole, taille),0);
 	printf("posX : %3d  posY : %3d", posX,posY);
+	positionChar(posX,posY);
 }
 
 //Sauvegarde les donnes des listes dans le fichier teste.txt dans le repertoire d execution de l application
@@ -271,7 +272,7 @@ void ouvrir(PParagraphe pdebut, PParagraphe pfin) {		//A tester
 
 int main() {
 	SetConsoleTitle("Notepad--");
-	int i;
+	int i, a=0;
 	int posX,posY;
 	PParagraphe pdebut, pfin, px;						//px est le pointeur du paragraphe courant
 	PCaractere py;										//py est le pointeur du caractere courant
@@ -346,6 +347,7 @@ int main() {
 		else if (i==19) {				//CTRL + S
     		//Sauvegarder dans un fichier
 			enregistrer(hConsole, pdebut, pfin);
+			position(posX,posY,hConsole,taille);
 		}
     	else if (i==15) {				//CTRL + O
     		//Ouvrir depuis un fichier
@@ -365,6 +367,17 @@ int main() {
 			selectionner();
 		}
 
+		else if (i==8){                 //Backspace
+			if (a==1){                  //Si un backspace à été entrée précédemment
+               			 py=pointeurPositionCaractere(posY-1,px); //On se place sur la case d'avant
+		   	 }
+		  	 a=1;
+            		 py->info.c=NULL;
+           		 posY=posY-1;
+           		 position(posX,posY,hConsole,taille);
+          		 affiche(hConsole, 0, fond, couleur);
+          		 px->quantiteCaractere=px->quantiteCaractere-1;
+		}
 //		else if (i==560){fond=0;couleur=15;} 												// touche F2
 //		else if (i==561){fond=10;couleur=15;} 												// touche F3
 //		else if (i==562){fond=10;couleur=1;} 												// touche F3
@@ -375,7 +388,8 @@ int main() {
 			positionChar(posX,posY);
 
 			//Enregistrement du caractere tape dans le paragraphe
-			py=insertionCaractere(py);
+			if(a!=1){py=insertionCaractere(py);}
+			else{a=0;}
 			py->info.c=i;
 			px->quantiteCaractere=px->quantiteCaractere+1;
 		  	affiche(hConsole, i, fond, couleur);
