@@ -266,44 +266,37 @@ void enregistrer(HANDLE hConsole, PParagraphe pdebut, PParagraphe pfin) {		//Fon
 //Retourne 
 PCaractere selectionner(PCaractere py, int posX,int posY, HANDLE hConsole, short taille, PParagraphe px) {		//A coder
     PCaractere pz = py;
-    int i = -1, fond=0, couleur=15;
+    int i = -1, fond=15, couleur=0;
     while (i!=6){
         i = lireCaract();
-        if (i==477){
-            if(posY<quantiteCaractere(px->pc))
-            {
+        if (i==477) {
+            if(posY<quantiteCaractere(px->pc)) {
                 posY++;
                 pz=pz->cs;
-            }
-            position(posX,posY,hConsole,taille);
-            SetConsoleTextAttribute(hConsole, BACKGROUND_BLUE | BACKGROUND_GREEN | BACKGROUND_RED);
+            } 
             affiche(hConsole, pz->info.c, fond, couleur);       //Réécrire le caractere avec le fond blanc et de police noir
+            position(posX,posY,hConsole,taille);
 
 
         }
-        if (i==475){
-            if(posY>=1)
-            {
+        if (i==475) {
+            if(posY>=1) {
                 posY--;
-                if(posY==0)
-                {
+                if(posY==0) {
                     pz=px->pc;
                 }
-                else
-                {
+                else {
                     pz=pointeurPositionCaractere(posY, px->pc->cs);
                 }
             }
-            position(posX,posY,hConsole,taille);
-            SetConsoleTextAttribute(hConsole, FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_RED);
-            affiche(hConsole, pz->info.c, fond, couleur);
-
+            affiche(hConsole, pz->info.c, couleur, fond);
+			position(posX,posY,hConsole,taille);
         }
-        if (i==26){
+        if (i==3) {
             pz=py;
             break;
         }
-        if (i==3){
+        if (i==26) {
             break;
         }
     }
@@ -320,35 +313,28 @@ void ouvrir(PParagraphe pdebut, PParagraphe pfin, PParagraphe pPoubelleParagraph
     fscanf(f, "%c", &test);
     fclose(f);
     f = fopen("texte.txt", "r");
-    if(test==-1)
-    {
+    if(test==-1) {
         MessageBeep(MB_OK);
         MessageBox(NULL, TEXT("Le fichier 'texte.txt' est introuvable.\nAnnulation."), TEXT("Alerte"),MB_OK);
     }
-    else
-    {
+    else {
         // -------------------------------------------- VIDER LA LISTE EXISTANTE
         pdebut->ps=pfin;
         pfin->pp=pdebut;
         pdebut->numeroParagraphe=-1;
         px=pdebut;
-
-        do
-        {
+        do {
             px=insertionParagraphe(px, pPoubelleParagrapheDebut, pPoubelleParagrapheFin, pPoubelleCaractere);
             px->numeroParagraphe=px->pp->numeroParagraphe+1;
             py=px->pc;
-            do
-            {
+            do {
                 fscanf(f,"%c", &i);
-                if(i!=42 && i!=58 && i!=59)  						//i=42 => *
-                {
+                if(i!=42 && i!=58 && i!=59) { 						//i=42 => *
                     py=insertionCaractere(py, pPoubelleCaractere);
                     py->info.c=i;
                     px->quantiteCaractere++;
                     printf("%c", i);
                 }
-
             }
             while(i!=58 && i!=42);						//i=58 => :
             if(i!=42)
@@ -439,8 +425,13 @@ int main() {
     while (i!=3)  				//CTRL + C
     {
         //Verification de posX et posY, si hors limites ou valeurs interdites
-        if(posY<0) {		//Si trop a gauche
-        	posY=0;
+        if(posY<0 && posX>0) {		//Si trop a gauche et ligne au dessus
+        	posX--;
+        	px=px->pp;
+        	posY=quantiteCaractere(px->pc);
+		}
+		if(posY<0 && posX==0) {		//Si trop a gauche et pas de ligne au dessus
+			posY=0;
 		}
         if(posX<0) {		//Si trop en haut
         	posX=0;
@@ -449,7 +440,12 @@ int main() {
         	posX=quantiteParagraphe(pdebut, pfin)-1;
 		}
 		px=pointeurPositionParagraphe(posX, pdebut);
-        if(posY>px->quantiteCaractere) {		//Si trop a droite
+		if(posY>px->quantiteCaractere && quantiteParagraphe(pdebut, pfin)>posX+1) {		//Si trop a droite et ligne en dessous
+			posX++;
+			px=px->ps;
+			posY=0;
+		}
+        if(posY>px->quantiteCaractere && quantiteParagraphe(pdebut, pfin)==posX+1) {		//Si trop a droite et pas de ligne en dessous
         	posY=px->quantiteCaractere;
 		}
         py=pointeurPositionCaractere(posY, px->pc);
@@ -496,6 +492,7 @@ int main() {
         else if (i==15)  				//CTRL + O
         {
             //Ouvrir depuis un fichier
+            system("cls");
             ouvrir(pdebut, pfin, pPoubelleParagrapheDebut, pPoubelleParagrapheFin, pPoubelleCaractere);
             px=pfin->pp;	//Px sur dernier para
             py=px->pc;		//Py sur dernier caract
@@ -505,7 +502,7 @@ int main() {
                 py=py->cs;
                 posY=posY++;
             }
-            posX=px->numeroParagraphe-1;
+            posX=px->numeroParagraphe; //-1
             positionChar(posX,posY);
             position(posX, posY,hConsole,taille);
         }
