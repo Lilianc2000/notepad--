@@ -564,7 +564,7 @@ int main() {
         }
     }
 
-    positionChar(29,0);slghzoufgerzbaimzphf'fgveclaiehgfzèeqkjhqdcuo'
+    positionChar(29,0);
 
     return 0;
 
