@@ -512,8 +512,6 @@ int main() {
 
 		//Lecture du caractere tape au clavier
 		i=lireCaract();
-		affiche(hConsole,i,fond,couleur);
-
         if (i==13)  					//Entree
         {
             posX++;
@@ -605,17 +603,17 @@ int main() {
             MessageBox(NULL, TEXT("Fonctions disponibles :\n - CTRL + C : Quitter le programme\n - CTRL + S : Enregistrer le fichier\n - CTRL + O : Ouvrir un fichier\n - CTRL + D : Selectionner\n - CTRL + F : Arreter la selection\n - F2 : Copier la selection\n - F3 : Couper la selection\n - F4 : Coller la selection\n"), TEXT("Aide"),MB_OK);
 
         }
-        else if (i==560){} 												// touche F2
-        else if (i==561){} 												// touche F3
-        else if (i==562){} 												// touche F4
-        else if (i==563){} 												// touche F5
-        else if (i==564){} 												// touche F6
-        else if (i==565){} 												// touche F7
-        else if (i==566){} 												// touche F8
-        else if (i==567){} 												// touche F9
-        else if (i==568){} 												// touche F10
-        else if (i==569){} 												// touche F11
-        else if (i==570){} 												// touche F12
+        else if (i==560){printf("F2");} 												// touche F2
+        else if (i==561){printf("F3");} 												// touche F3
+        else if (i==562){printf("F4");} 												// touche F4
+        else if (i==563){printf("F5");} 												// touche F5
+        else if (i==564){printf("F6");} 												// touche F6
+        else if (i==565){printf("F7");} 												// touche F7
+        else if (i==566){printf("F8");} 												// touche F8
+        else if (i==567){printf("F9");} 												// touche F9
+        else if (i==568){printf("F10");} 												// touche F10
+        else if (i==569){printf("F11");} 												// touche F11
+        else if (i==570){printf("F12");} 												// touche F12
         else if (i==3) {}				//CTRL + C sortir du programme
         else if (i==42 || i==58 || i==59){}
         else { 				//Affiche le caractere courant
