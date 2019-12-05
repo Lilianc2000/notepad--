@@ -451,11 +451,41 @@ int main() {
     	
     	
         //Verification de posX et posY, si hors limites ou valeurs interdites
+        if(i==472) {		//Haut
+        	if(posX<0) {		//Si trop haut
+        		posX++;
+			} else if(posY>quantiteCaractere(px->pp->pc)) {		//Si trop a droite par rapport a la ligne du dessus
+				posY=quantiteCaractere(px->pp->pc);
+			}
+		}
+        if(i==475) {		//Gauche
+        	if(posY<0) {		//Si trop a gauche
+        		if(posX>0) {
+        			posX--;
+        			posY=quantiteCaractere(px->pp->pc);
+				} else if(posX==0) {
+					posY++;
+				}
+			}
+		}
+        if(i==477) {		//Droite
+        	if(posY>quantiteCaractere(px->pc)) {		//Si trop a droite
+        		if(posX+1<quantiteParagraphe(pdebut, pfin)) {
+        			posX++;
+        			posY=0;
+				} else if(posX+1==quantiteParagraphe(pdebut, pfin)) {
+					posY--;
+				}
+			}
+		}
+        if(i==480) {		//Bas
+        	if(posX+1>quantiteParagraphe(pdebut, pfin)) {		//Si trop bas
+        		posX--;
+			} else if(posY>quantiteCaractere(px->ps->pc)) {		//Si trop a droite par rapport a la ligne du dessous
+				posY=quantiteCaractere(px->ps->pc);
+			}
+		}
         
-        
-        
-		
-		
 		px=pointeurPositionParagraphe(posX, pdebut);
         py=pointeurPositionCaractere(posY, px->pc);
         position(posX, posY, hConsole, taille);		//position(quantiteCaractere(pPoubelleCaractere), quantiteParagraphe(pPoubelleParagrapheDebut, pPoubelleParagrapheFin), hConsole, taille); -> pour afficher les quantites de cases dans les poubelles
