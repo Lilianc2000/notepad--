@@ -108,15 +108,21 @@ PParagraphe insertionParagraphe(PParagraphe px, PParagraphe pPoubelleParagrapheD
 PCaractere insertionCaractere(PCaractere px, PCaractere pPoubelleCaractere) {		//Fonctionne
 	PCaractere py;
     if(pPoubelleCaractere->cs!=NULL) {		//Si la liste poubelle de caractere n est pas vide
+    	//Recuperer dans py le dernier caractere de la poubelle
     	py=pointeurPositionCaractere(quantiteCaractere(pPoubelleCaractere), pPoubelleCaractere);
+    	//Decrocher ce dernier caractere de la poubelle
     	pointeurPositionCaractere(quantiteCaractere(pPoubelleCaractere)-1, pPoubelleCaractere)->cs=NULL;
-	} else {
+	} else {		//Sinon creation d un nouveau caractere
 		py=(PCaractere)malloc(sizeof(TSuiteCaractere));
 	}
-    py->cs=px->cs;
-    px->cs=py;
-    px->cs->cs=NULL;
-    return px->cs;
+	if(px->cs==NULL) {		//Si il n y a pas de caractere apres px (si px est en bout de ligne)
+		px->cs=py;
+		py->cs=NULL;
+	} else {		//Si il y a des caracteres apres px (si px n est pas en bout de ligne)
+		py->cs=px->cs;
+		px->cs=py;
+	}
+    return py;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
@@ -159,6 +165,25 @@ void affiche(HANDLE hConsole, char c,int fond, int couleur) {		//Fonctionne
     printf("%c", c);
 }
 
+//Affiche tous les caracteres
+void dynamiqueAffichageAll(HANDLE hConsole, PParagraphe pdebut, PParagraphe pfin) {
+	PParagraphe px=pdebut;
+	PCaractere py;
+	system("cls");
+	while(px->ps!=pfin) {
+		px=px->ps;
+		py=px->pc;
+		while(py->cs!=NULL) {
+			py=py->cs;
+			SetConsoleTextAttribute(hConsole, 16*(py->info.fond)+py->info.couleur);
+			printf("%c", py->info.c);
+		}
+		if(px->ps!=pfin) {
+			printf("\n");
+		}
+	}
+}
+
 //Retourne la quantite de lignes pouvant etre affichee par la fenetre de commande
 short tailleFenetre(HANDLE hConsole, short taille) {		//Fonctionne
     positionChar(taille, 0);
@@ -182,6 +207,20 @@ void position(int posX,int posY, HANDLE hConsole, short taille) {		//Fonctionne
     positionChar(tailleFenetre(hConsole, taille),0);
     printf("posX : %3d  posY : %3d", posX,posY);
     positionChar(posX,posY);
+}
+
+//Surligne les caracteres entre pyA et pyB (fond blanc police noir), px le paragraphe contenant pyA, pyA est AVANT pyB
+void surligneur(PParagraphe px, PCaractere pyA, PCaractere pyB) {
+	while(pyA!=pyB) {
+		pyA->info.couleur=0;
+		pyA->info.fond=15;
+		if(pyA->cs!=NULL) {
+			pyA=pyA->cs;
+		} else {
+			px=px->ps;
+			pyA=px->pc->cs;
+		}
+	}
 }
 
 //Sauvegarde les donnes des listes dans le fichier texte.txt dans le repertoire d execution de l application
@@ -361,7 +400,7 @@ PParagraphe deplacementParagraphe(PParagraphe px, PParagraphe pPoubelleParagraph
 }
 
 //Deplace toutes les cases caracteres entre pA (exclus) et pB (inclus) dans la liste pPoubelle appropriee, px correspond au paragraphe contenant pA
-void deplacementPoubelle(PParagraphe px, PCaractere pA, PCaractere pB, PParagraphe pPoubelleParagrapheFin, PCaractere pPoubelleCaractere) {		//A tester
+void deplacementPoubelle(PParagraphe px, PCaractere pA, PCaractere pB, PParagraphe pPoubelleParagrapheFin, PCaractere pPoubelleCaractere) {		//Fonctionne
 	//pointeurPositionCaractere(quantiteCaractere(pPoubelleCaractere), pPoubelleCaractere)  => pointeur du dernier caractere dans la poubelle caractere
 	PCaractere py;
 	int fin=0;
@@ -390,10 +429,10 @@ void deplacementPoubelle(PParagraphe px, PCaractere pA, PCaractere pB, PParagrap
 
 int main() {
     SetConsoleTitle("Notepad--");
-    int i, a=0;
+    int i, a=0, selection=0;																//=0 pas de selection en cours, =1 selection en cours
     int posX,posY;
-    PParagraphe pdebut, pfin, px, pPoubelleParagrapheDebut, pPoubelleParagrapheFin;			//px est le pointeur du paragraphe courant
-    PCaractere py, pPoubelleCaractere;														//py est le pointeur du caractere courant
+    PParagraphe pdebut, pfin, px, pxA, pxB, pPoubelleParagrapheDebut, pPoubelleParagrapheFin;			//px est le pointeur du paragraphe courant
+    PCaractere py, pyA, pyB, pPoubelleCaractere, pPressePapier;														//py est le pointeur du caractere courant
 	int fond,couleur;
     HANDLE hConsole=GetStdHandle(STD_OUTPUT_HANDLE);
     short taille = tailleFenetre(hConsole,0);
@@ -401,8 +440,8 @@ int main() {
     couleur=15;
     i=0;
     posX=0;												//Coordonnee sur les lignes / en ordonnee
-    posY=0;												///Coordonnee sur les colonnes / en abscisse
-
+    posY=0;												//Coordonnee sur les colonnes / en abscisse
+	
     //Creation de la liste paragraphe
     pdebut=(PParagraphe)malloc(sizeof(TSuiteParagraphe));
     pfin=(PParagraphe)malloc(sizeof(TSuiteParagraphe));
@@ -417,6 +456,10 @@ int main() {
 	pPoubelleCaractere=(PCaractere)malloc(sizeof(TSuiteCaractere));
 	pPoubelleCaractere->cs=NULL;
 	
+	//Creation du presse papier
+	pPressePapier=(PCaractere)malloc(sizeof(TSuiteCaractere));
+	pPressePapier->cs=NULL;
+	
     //Creation du 1ier paragraphe
     px=insertionParagraphe(pdebut, pPoubelleParagrapheDebut, pPoubelleParagrapheFin, pPoubelleCaractere);
     px->numeroParagraphe=posX;
@@ -424,103 +467,116 @@ int main() {
 
     while (i!=3)  				//CTRL + C
     {
+    	
+    	
         //Verification de posX et posY, si hors limites ou valeurs interdites
-        if(posY<0 && posX>0) {		//Si trop a gauche et ligne au dessus
-        	posX--;
-        	px=px->pp;
-        	posY=quantiteCaractere(px->pc);
+        if(i==472) {		//Haut
+        	if(posX<0) {		//Si trop haut
+        		posX++;
+			} else if(posY>quantiteCaractere(px->pp->pc)) {		//Si trop a droite par rapport a la ligne du dessus
+				posY=quantiteCaractere(px->pp->pc);
+			}
 		}
-		if(posY<0 && posX==0) {		//Si trop a gauche et pas de ligne au dessus
-			posY=0;
+        if(i==475) {		//Gauche
+        	if(posY<0) {		//Si trop a gauche
+        		if(posX>0) {
+        			posX--;
+        			posY=quantiteCaractere(px->pp->pc);
+				} else if(posX==0) {
+					posY++;
+				}
+			}
 		}
-        if(posX<0) {		//Si trop en haut
-        	posX=0;
+        if(i==477) {		//Droite
+        	if(posY>quantiteCaractere(px->pc)) {		//Si trop a droite
+        		if(posX+1<quantiteParagraphe(pdebut, pfin)) {
+        			posX++;
+        			posY=0;
+				} else if(posX+1==quantiteParagraphe(pdebut, pfin)) {
+					posY--;
+				}
+			}
 		}
-		if(posX>=quantiteParagraphe(pdebut, pfin)) {		//Si trop en bas
-        	posX=quantiteParagraphe(pdebut, pfin)-1;
+        if(i==480) {		//Bas
+        	if(posX+1>quantiteParagraphe(pdebut, pfin)) {		//Si trop bas
+        		posX--;
+			} else if(posY>quantiteCaractere(px->ps->pc)) {		//Si trop a droite par rapport a la ligne du dessous
+				posY=quantiteCaractere(px->ps->pc);
+			}
 		}
+        
 		px=pointeurPositionParagraphe(posX, pdebut);
-		if(posY>px->quantiteCaractere && quantiteParagraphe(pdebut, pfin)>posX+1) {		//Si trop a droite et ligne en dessous
-			posX++;
-			px=px->ps;
-			posY=0;
-		}
-        if(posY>px->quantiteCaractere && quantiteParagraphe(pdebut, pfin)==posX+1) {		//Si trop a droite et pas de ligne en dessous
-        	posY=px->quantiteCaractere;
-		}
         py=pointeurPositionCaractere(posY, px->pc);
         position(posX, posY, hConsole, taille);		//position(quantiteCaractere(pPoubelleCaractere), quantiteParagraphe(pPoubelleParagrapheDebut, pPoubelleParagrapheFin), hConsole, taille); -> pour afficher les quantites de cases dans les poubelles
         positionChar(posX, posY);
 		
-		///Lecture du caractere tape au clavier
+		//Lecture du caractere tape au clavier
 		i=lireCaract();
 		
         if (i==13)  					//Entree
         {
             posX++;
             posY=0;
-            //Insertion d un nouveau paragraphe apres px
-            px=insertionParagraphe(px, pPoubelleParagrapheDebut, pPoubelleParagrapheFin, pPoubelleCaractere);
-            px->numeroParagraphe=posX;
-            py=px->pc;
-
-//            position(posX,posY,hConsole,taille);
-//            positionChar(posX,posY);
-        }
-        else if (i==472)  				//Fleche haut posX--
-        {
+            if(py->cs==NULL) {		//Si retour a la ligne en bout de ligne
+            	//Insertion d un nouveau paragraphe apres px
+            	px=insertionParagraphe(px, pPoubelleParagrapheDebut, pPoubelleParagrapheFin, pPoubelleCaractere);
+            	px->numeroParagraphe=posX;
+            	py=px->pc;
+			} else {		//Si retour a la ligne pas en bout de ligne (il y a des caracteres apres)
+				px->quantiteCaractere=px->quantiteCaractere-quantiteCaractere(py);
+				px=insertionParagraphe(px, pPoubelleParagrapheDebut, pPoubelleParagrapheFin, pPoubelleCaractere);
+				px->pc->cs=py->cs;
+				py->cs=NULL;
+				px->numeroParagraphe=posX;
+				py=px->pc;
+				px->quantiteCaractere=quantiteCaractere(py);
+			}
+            dynamiqueAffichageAll(hConsole, pdebut, pfin);
+        } else if (i==472) { 				//Fleche haut posX--
             posX--;
-        }
-        else if (i==475)  				//Fleche gauche posY--
-        {
+        } else if (i==475) { 				//Fleche gauche posY--
             posY--;
-        }
-        else if (i==477)  				//Fleche droite posY++
-        {
+        } else if (i==477) { 				//Fleche droite posY++
 	        posY++;
-        }
-        else if (i==480)  				//Fleche bas posX++
-        {
+        } else if (i==480) { 				//Fleche bas posX++
             posX++;
-        }
-        else if (i==19)  				//CTRL + S
-        {
+        } else if (i==19) { 				//CTRL + S
             //Sauvegarder dans un fichier
             enregistrer(hConsole, pdebut, pfin);
             position(posX,posY,hConsole,taille);
-        }
-        else if (i==15)  				//CTRL + O
-        {
+        } else if (i==15) { 				//CTRL + O
             //Ouvrir depuis un fichier
             system("cls");
             ouvrir(pdebut, pfin, pPoubelleParagrapheDebut, pPoubelleParagrapheFin, pPoubelleCaractere);
             px=pfin->pp;	//Px sur dernier para
             py=px->pc;		//Py sur dernier caract
             posY=0;
-            while(py->cs!=NULL)
-            {
+            while(py->cs!=NULL) {
                 py=py->cs;
-                posY=posY++;
+                posY++;
             }
             posX=px->numeroParagraphe; //-1
             positionChar(posX,posY);
             position(posX, posY,hConsole,taille);
-        }
-        else if (i==4)  				//CTRL + D
-        {
-            selectionner(py, posX, posY, hConsole, taille, px);
-        }
-
-        else if (i==8)                  //Backspace
-        {
-            
+        } else if (i==4) { 				//CTRL + D debut de selection
+        	selection=1;
+            pyA=py->cs;
+            pxA=px;
+        } else if(i==6) {				//CTRL + F fin de selection
+        	if(selection==1) {
+        		selection=0;
+        		pyB=py;
+        		pxB=px;
+			}
+		} else if(i==26) {				//CTRL + z anulation de la selection
+			if(selection==1) {
+				selection=0;
+			}
+		} else if(i==22) {				//CTRL + v coller
 			
-//			if (a==1)                   //Si un backspace à été entré précédemment
-//            {
-//                py=pointeurPositionCaractere(posY-1, px->pc);		//On se place sur la case d'avant
-//            }
-//            a=1;
-            if(posY!=0) {		//Si on n efface pas le retour a la ligne
+			
+		} else if (i==8) {                 //Backspace
+            if(posY!=0) {		//Si on n efface pas un retour a la ligne
             	posY--;
 	            py=pointeurPositionCaractere(posY, px->pc);
 	            deplacementPoubelle(px, py, py->cs, pPoubelleParagrapheFin, pPoubelleCaractere);
@@ -531,36 +587,39 @@ int main() {
 				posX--;
 				posY=quantiteCaractere(px->pp->pc);
 				if(px->pc->cs!=NULL) {		//Si paragraphe contient des caracteres, il faut recuperer son contenu
-					pointeurPositionCaractere(quantiteCaractere(px->pp->pc),  px->pp->pc)->cs=px->pc->cs;		//Deplacement des caracteres du paragraphe px apres le dernier caractere du paragraphe precedent
+					//Mise a jour du nombre de caractere dans le paragraphe recuperateur
+					px->pp->quantiteCaractere=px->pp->quantiteCaractere+quantiteCaractere(px->pc);
+					//Deplacement des caracteres du paragraphe px apres le dernier caractere du paragraphe precedent
+					pointeurPositionCaractere(quantiteCaractere(px->pp->pc),  px->pp->pc)->cs=px->pc->cs;
 				}
+				px->pc->cs=NULL;
 				pointeurPositionCaractere(quantiteCaractere(pPoubelleCaractere), pPoubelleCaractere)->cs=px->pc;		//Deplacement du bidon dans la liste poubelle
 				px=deplacementParagraphe(px, pPoubelleParagrapheFin);		//Deplacement du paragraphe px dans la liste poubelle
 				py=pointeurPositionCaractere(posY, px->pc);
 			}
+			dynamiqueAffichageAll(hConsole, pdebut, pfin);
         }
 //		else if (i==560){fond=0;couleur=15;} 												// touche F2
 //		else if (i==561){fond=10;couleur=15;} 												// touche F3
 //		else if (i==562){fond=10;couleur=1;} 												// touche F3
 
-        else if (i==3) {}				// touche CTRL + C sortir du programme
-        else  				//Affiche le caractere courant
-        {
+        else if (i==3) {}				//CTRL + C sortir du programme
+        else { 				//Affiche le caractere courant
             position(posX,posY,hConsole,taille);
             positionChar(posX,posY);
 
-            //Enregistrement du caractere tape dans le paragraphe
-//            if(a!=1) {
-//                py=insertionCaractere(py);
-//            } else {
-//                a=0;
-//            }
-            
             py=insertionCaractere(py, pPoubelleCaractere);
             
             py->info.c=i;
+            py->info.couleur=15;
+            py->info.fond=0;
             px->quantiteCaractere=px->quantiteCaractere+1;
             affiche(hConsole, i, fond, couleur);
             posY=posY+1;
+            
+            if(py->cs!=NULL) {
+            	dynamiqueAffichageAll(hConsole, pdebut, pfin);
+			}
         }
     }
 
