@@ -54,7 +54,7 @@ int quantiteParagraphe(PParagraphe pdebut, PParagraphe pfin) {		//Fonctionne
 }
 
 //Retourne le pointeur px de la case correspondante a la position donnee dans la liste paragraphe
-PParagraphe pointeurPositionParagraphe(int position, PParagraphe pdebut) {		//Fonctionne 
+PParagraphe pointeurPositionParagraphe(int position, PParagraphe pdebut) {		//Fonctionne
     PParagraphe px=pdebut->ps;
     int i=0;
     while(i<position)
@@ -202,10 +202,10 @@ short tailleFenetre(HANDLE hConsole, short taille) {		//Fonctionne
     return rows;
 }
 
-//Affiche les valeurs de posY et posX en bas de fenetre
+//Affiche l'aide en bas de fenetre
 void position(int posX,int posY, HANDLE hConsole, short taille) {		//Fonctionne
     positionChar(tailleFenetre(hConsole, taille),0);
-    printf("posX : %3d  posY : %3d", posX,posY);
+    printf("Pour voir les commandes disponibles : F1", posX,posY);
     positionChar(posX,posY);
 }
 
@@ -302,7 +302,7 @@ void enregistrer(HANDLE hConsole, PParagraphe pdebut, PParagraphe pfin) {		//Fon
     }
 }
 
-//Retourne 
+//Retourne
 PCaractere selectionner(PCaractere py, int posX,int posY, HANDLE hConsole, short taille, PParagraphe px) {		//A coder
     PCaractere pz = py;
     int i = -1, fond=15, couleur=0;
@@ -312,7 +312,7 @@ PCaractere selectionner(PCaractere py, int posX,int posY, HANDLE hConsole, short
             if(posY<quantiteCaractere(px->pc)) {
                 posY++;
                 pz=pz->cs;
-            } 
+            }
             affiche(hConsole, pz->info.c, fond, couleur);       //Réécrire le caractere avec le fond blanc et de police noir
             position(posX,posY,hConsole,taille);
 
@@ -441,13 +441,13 @@ int main() {
     i=0;
     posX=0;												//Coordonnee sur les lignes / en ordonnee
     posY=0;												//Coordonnee sur les colonnes / en abscisse
-	
+
     //Creation de la liste paragraphe
     pdebut=(PParagraphe)malloc(sizeof(TSuiteParagraphe));
     pfin=(PParagraphe)malloc(sizeof(TSuiteParagraphe));
     pdebut->ps=pfin;
     pfin->pp=pdebut;
-	
+
 	//Creation des listes de poubelle
 	pPoubelleParagrapheDebut=(PParagraphe)malloc(sizeof(TSuiteParagraphe));
 	pPoubelleParagrapheFin=(PParagraphe)malloc(sizeof(TSuiteParagraphe));
@@ -455,11 +455,11 @@ int main() {
 	pPoubelleParagrapheFin->pp=pPoubelleParagrapheDebut;
 	pPoubelleCaractere=(PCaractere)malloc(sizeof(TSuiteCaractere));
 	pPoubelleCaractere->cs=NULL;
-	
+
 	//Creation du presse papier
 	pPressePapier=(PCaractere)malloc(sizeof(TSuiteCaractere));
 	pPressePapier->cs=NULL;
-	
+
     //Creation du 1ier paragraphe
     px=insertionParagraphe(pdebut, pPoubelleParagrapheDebut, pPoubelleParagrapheFin, pPoubelleCaractere);
     px->numeroParagraphe=posX;
@@ -467,8 +467,8 @@ int main() {
 
     while (i!=3)  				//CTRL + C
     {
-    	
-    	
+
+
         //Verification de posX et posY, si hors limites ou valeurs interdites
         if(i==472) {		//Haut
         	if(posX<0) {		//Si trop haut
@@ -504,15 +504,16 @@ int main() {
 				posY=quantiteCaractere(px->ps->pc);
 			}
 		}
-        
+
 		px=pointeurPositionParagraphe(posX, pdebut);
         py=pointeurPositionCaractere(posY, px->pc);
         position(posX, posY, hConsole, taille);		//position(quantiteCaractere(pPoubelleCaractere), quantiteParagraphe(pPoubelleParagrapheDebut, pPoubelleParagrapheFin), hConsole, taille); -> pour afficher les quantites de cases dans les poubelles
         positionChar(posX, posY);
-		
+
 		//Lecture du caractere tape au clavier
 		i=lireCaract();
-		
+		affiche(hConsole,i,fond,couleur);
+
         if (i==13)  					//Entree
         {
             posX++;
@@ -573,8 +574,8 @@ int main() {
 				selection=0;
 			}
 		} else if(i==22) {				//CTRL + v coller
-			
-			
+
+
 		} else if (i==8) {                 //Backspace
             if(posY!=0) {		//Si on n efface pas un retour a la ligne
             	posY--;
@@ -599,24 +600,37 @@ int main() {
 			}
 			dynamiqueAffichageAll(hConsole, pdebut, pfin);
         }
-//		else if (i==560){fond=0;couleur=15;} 												// touche F2
-//		else if (i==561){fond=10;couleur=15;} 												// touche F3
-//		else if (i==562){fond=10;couleur=1;} 												// touche F3
+        else if (i==559){                                                                    //touche F1 : help
+            MessageBeep(MB_ICONINFORMATION);
+            MessageBox(NULL, TEXT("Fonctions disponibles :\n - CTRL + C : Quitter le programme\n - CTRL + S : Enregistrer le fichier\n - CTRL + O : Ouvrir un fichier\n - CTRL + D : Selectionner\n - CTRL + F : Arreter la selection\n - F2 : Copier la selection\n - F3 : Couper la selection\n - F4 : Coller la selection\n"), TEXT("Aide"),MB_OK);
 
+        }
+        else if (i==560){} 												// touche F2
+        else if (i==561){} 												// touche F3
+        else if (i==562){} 												// touche F4
+        else if (i==563){} 												// touche F5
+        else if (i==564){} 												// touche F6
+        else if (i==565){} 												// touche F7
+        else if (i==566){} 												// touche F8
+        else if (i==567){} 												// touche F9
+        else if (i==568){} 												// touche F10
+        else if (i==569){} 												// touche F11
+        else if (i==570){} 												// touche F12
         else if (i==3) {}				//CTRL + C sortir du programme
+        else if (i==42 || i==58 || i==59){}
         else { 				//Affiche le caractere courant
             position(posX,posY,hConsole,taille);
             positionChar(posX,posY);
 
             py=insertionCaractere(py, pPoubelleCaractere);
-            
+
             py->info.c=i;
             py->info.couleur=15;
             py->info.fond=0;
             px->quantiteCaractere=px->quantiteCaractere+1;
             affiche(hConsole, i, fond, couleur);
             posY=posY+1;
-            
+
             if(py->cs!=NULL) {
             	dynamiqueAffichageAll(hConsole, pdebut, pfin);
 			}
