@@ -561,6 +561,7 @@ int main() {
         	selection=1;
             pyA=py->cs;
             pxA=px;
+        //    selectionner(pyA,posX,posY,hConsole,taille,pxA)
         } else if(i==6) {				//CTRL + F fin de selection
         	if(selection==1) {
         		selection=0;
@@ -571,10 +572,11 @@ int main() {
 			if(selection==1) {
 				selection=0;
 			}
-		} else if(i==22) {				//CTRL + v coller
+		} else if (i==560){copier();} 												// touche F2 : copier
+          else if (i==561){printf("F3");} 												// touche F3 : couper
+          else if (i==562){printf("F4");} 												// touche F4 : coller
 
-
-		} else if (i==8) {                 //Backspace
+		  else if (i==8) {                 //Backspace
             if(posY!=0) {		//Si on n efface pas un retour a la ligne
             	posY--;
 	            py=pointeurPositionCaractere(posY, px->pc);
@@ -603,9 +605,6 @@ int main() {
             MessageBox(NULL, TEXT("Fonctions disponibles :\n - CTRL + C : Quitter le programme\n - CTRL + S : Enregistrer le fichier\n - CTRL + O : Ouvrir un fichier\n - CTRL + D : Selectionner\n - CTRL + F : Arreter la selection\n - F2 : Copier la selection\n - F3 : Couper la selection\n - F4 : Coller la selection\n"), TEXT("Aide"),MB_OK);
 
         }
-        else if (i==560){printf("F2");} 												// touche F2
-        else if (i==561){printf("F3");} 												// touche F3
-        else if (i==562){printf("F4");} 												// touche F4
         else if (i==563){printf("F5");} 												// touche F5
         else if (i==564){printf("F6");} 												// touche F6
         else if (i==565){printf("F7");} 												// touche F7
