@@ -393,7 +393,7 @@ int main() {
     int i, a=0, selection=0, posA=0, posB=0;																//=0 pas de selection en cours, =1 selection en cours
     int posX,posY;
     PParagraphe pdebut, pfin, px, pxA, pxB, pPoubelleParagrapheDebut, pPoubelleParagrapheFin;			//px est le pointeur du paragraphe courant
-    PCaractere py, pyA, pyB, pPoubelleCaractere, pPressePapier;														//py est le pointeur du caractere courant
+    PCaractere py, pyA = NULL, pyB = NULL, pPoubelleCaractere, pPressePapier;														//py est le pointeur du caractere courant
 	int fond,couleur;
     HANDLE hConsole=GetStdHandle(STD_OUTPUT_HANDLE);
     short taille = tailleFenetre(hConsole,0);
@@ -470,6 +470,7 @@ int main() {
         py=pointeurPositionCaractere(posY, px->pc);
         if (i==477 && selection == 1) {affiche(hConsole, py->info.c, couleur, fond);}
         if (i==475 && selection == 1) {affiche(hConsole, py->info.c, fond, couleur);}
+        
         position(posX, posY, hConsole, taille);		//position(quantiteCaractere(pPoubelleCaractere), quantiteParagraphe(pPoubelleParagrapheDebut, pPoubelleParagrapheFin), hConsole, taille); -> pour afficher les quantites de cases dans les poubelles
         positionChar(posX, posY);
 
@@ -493,19 +494,25 @@ int main() {
 				py=px->pc;
 				px->quantiteCaractere=quantiteCaractere(py);
 			}
+			
             dynamiqueAffichageAll(hConsole, pdebut, pfin);
         } else if (i==472) { 				//Fleche haut posX--
             posX--;
+            
         } else if (i==475) { 				//Fleche gauche posY--
             posY--;
+            
         } else if (i==477) { 				//Fleche droite posY++
 	        posY++;
+	        
         } else if (i==480) { 				//Fleche bas posX++
             posX++;
+            
         } else if (i==19) { 				//CTRL + S
             //Sauvegarder dans un fichier
             enregistrer(hConsole, pdebut, pfin);
             position(posX,posY,hConsole,taille);
+            
         } else if (i==15) { 				//CTRL + O
             //Ouvrir depuis un fichier
             system("cls");
@@ -520,12 +527,13 @@ int main() {
             posX=px->numeroParagraphe; //-1
             positionChar(posX,posY);
             position(posX, posY,hConsole,taille);
+            
         } else if (i==4) { 				//CTRL + D debut de selection
         	selection=1;
             pyA=py;
             pxA=px;
             posA=posY;
-        //    selectionner(pyA,posX,posY,hConsole,taille,pxA)
+            
         } else if(i==6) {				//CTRL + F fin de selection
         	if(selection==1) {
         		dynamiqueAffichageAll(hConsole, pdebut, pfin);
@@ -541,30 +549,24 @@ int main() {
 		} else if (i==560){				//touche F2 : copier
 			
 			
-			
-			
-			
-			
-			
-			
 		} else if (i==561) {				// touche F3 : couper
-        	pPressePapier->cs=pyA;
-        	pointeurPositionCaractere(posA-1, pxA->pc)->cs=pyB->cs;
-        	pyB->cs=NULL;
-			pxA->quantiteCaractere=pxA->quantiteCaractere-quantiteCaractere(pPressePapier);			
-			dynamiqueAffichageAll(hConsole, pdebut, pfin);
-			posY=posY-quantiteCaractere(pPressePapier);
+			if(pyA != NULL && pyB != NULL){
+	        	pPressePapier->cs=pyA;
+	        	pointeurPositionCaractere(posA-1, pxA->pc)->cs=pyB->cs;
+	        	pyB->cs=NULL;
+				pxA->quantiteCaractere=pxA->quantiteCaractere-quantiteCaractere(pPressePapier);			
+				dynamiqueAffichageAll(hConsole, pdebut, pfin);
+				posY=posY-quantiteCaractere(pPressePapier);
+			}
 		} else if (i==562) {				// touche F4 : coller
-			position(quantiteCaractere(pPressePapier), posY, hConsole, taille);
-			positionChar(posX, posY);
-			
-			px->quantiteCaractere=pxA->quantiteCaractere+quantiteCaractere(pPressePapier);
-			pointeurPositionCaractere(posY-1, px->pc)->cs=pPressePapier->cs;
-			pointeurPositionCaractere(quantiteCaractere(pPressePapier), px->pc)->cs=py;
-		  	pPressePapier->cs=NULL;
-		  	
-		  	dynamiqueAffichageAll(hConsole, pdebut, pfin);
-		  	
+			if (pPressePapier->cs!=NULL) {
+				py = py -> cs;			
+				px->quantiteCaractere=px->quantiteCaractere+quantiteCaractere(pPressePapier);
+				pointeurPositionCaractere(posY, px->pc)->cs=pPressePapier->cs;
+				pointeurPositionCaractere(quantiteCaractere(pPressePapier)-1, px->pc)->cs=py;
+			  	pPressePapier->cs=NULL;
+			  	dynamiqueAffichageAll(hConsole, pdebut, pfin);
+		  	}
 		}
 
 		  else if (i==8) {                 //Backspace
@@ -630,4 +632,5 @@ int main() {
     return 0;
 
 }
+
 
